@@ -29,6 +29,31 @@ $(document).ready(function() {
     loadSound("demo.mp3");
     console.log('sound loaded');
 
+    // Beat detection variables
+    var beat_detected = true; 
+
+    // Visualization globals
+    var active_bg_color_idx = 0;
+    var BG_COLORS = [
+      "#F7977A",
+      "#F9AD81",
+      "#FDC68A",
+      "#FFF79A",
+      "#C4DF9B",
+      "#A2D39C",
+      "#82CA9D",
+      "#7BCDC8",
+      "#6ECFF6",
+      "#7EA7D8",
+      "#8493CA",
+      "#8882BE",
+      "#A187BE",
+      "#BC8DBF",
+      "#BC8DBF",
+      "#F49AC2",
+      "#F6989D"
+    ];
+
     function setupAudioNodes() {
         // setup a javascript node
         javascriptNode = context.createScriptProcessor(2048, 1, 1);
@@ -60,6 +85,7 @@ $(document).ready(function() {
             }, onError);
         }
         request.send();
+        setInterval(swapBackground, 1000);
     }
 
     function playSound(buffer) {
@@ -85,14 +111,35 @@ $(document).ready(function() {
         // set the fill style
         ctx.fillStyle=gradient;
         drawSpectrum(array);
+        if (detectBeat(array)) {
+          swapBackgroundColor();
+        }
     }
 
     function drawSpectrum(array) {
         for ( var i = 0; i < (array.length); i+=2 ){
             var value = array[i];
+            // TODO: Change to gradient of white/grey?
             ctx.fillRect(i*25,325-value,20,325);
             //  console.log([i,value])
         }
     };
+
+    /**
+     * A "beat" is defined by volume of a particular band of spectrum
+     * rising above a certain line. They're on 0-255 scale.
+     * TODO: Figure out best band to use
+     * TODO: Only swap on the "upswing", and ignore detection until after
+     * it drops below that threshold again (otherwise seizure mode every frame
+     * while the volume is above.
+     * TODO: Need to do a moving average to smooth things out...?
+     */
+    function detectBeat(array) {
+    }
+
+    function swapBackground() {
+      active_bg_color_idx = (active_bg_color_idx + 1) % BG_COLORS.length;
+      $('body').css('background-color', BG_COLORS[active_bg_color_idx]);
+    }
 
 });
