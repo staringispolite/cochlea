@@ -9,8 +9,8 @@ h1 {
   margin-bottom: 10px;
 }
 
-h1 a {
-  color: #EBEBEB;
+a {
+  color: #D7D7D7;
   text-decoration: none;
 }
 
@@ -54,8 +54,4 @@ h3 {
 .footer {
   text-align: center;
   margin-top: 160px;
-}
-
-.footer a {
-  color: #D7D7D7;
 }
