@@ -1,5 +1,5 @@
 # Cochlea
-## A configurable spectrum-band and beat-detection visualizer [[Live Demo]](http://staringispolite.github.io/cochlea/)
+## A configurable spectrum-band and beat-detection visualizer [[Live Demo Here]](http://staringispolite.github.io/cochlea/)
 
 
 **The cochlea _/ˈkɒk.lɪə/_** is the auditory portion of the inner ear. ![](http://upload.wikimedia.org/wikipedia/commons/thumb/a/a6/Cochlea.svg/490px-Cochlea.svg.png)

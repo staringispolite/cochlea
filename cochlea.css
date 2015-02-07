@@ -9,6 +9,11 @@ h1 {
   margin-bottom: 10px;
 }
 
+h1 a {
+  color: #EBEBEB;
+  text-decoration: none;
+}
+
 h3 {
   margin: 0 0 10px 0;
 }
@@ -24,6 +29,7 @@ h3 {
   margin: 0 auto;
   background-image: url('img/play-icon-256.png');
   background-size: contain;
+  cursor: pointer;
 }
 
 #controls.playing {
