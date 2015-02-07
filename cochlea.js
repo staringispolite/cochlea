@@ -31,6 +31,9 @@ $(document).ready(function() {
 
     // Beat detection variables
     var beat_detected = true; 
+    var beat_detect_band = 10;       // 10 3rd-to-last band we see.
+    var beat_detect_threshold = 150; // Out of 255;
+
 
     // Visualization globals
     var active_bg_color_idx = 0;
@@ -85,7 +88,6 @@ $(document).ready(function() {
             }, onError);
         }
         request.send();
-        setInterval(swapBackground, 1000);
     }
 
     function playSound(buffer) {
@@ -112,7 +114,7 @@ $(document).ready(function() {
         ctx.fillStyle=gradient;
         drawSpectrum(array);
         if (detectBeat(array)) {
-          swapBackgroundColor();
+          swapBackground();
         }
     }
 
@@ -135,6 +137,19 @@ $(document).ready(function() {
      * TODO: Need to do a moving average to smooth things out...?
      */
     function detectBeat(array) {
+      var new_beat_this_frame = false;
+      if (beat_detected) {
+        // Wait for band to go below threshold and un-mark 
+        if (array[beat_detect_band] < beat_detect_threshold) {
+          beat_detected = false; 
+        }
+      } else {
+        if (array[beat_detect_band] > beat_detect_threshold) {
+          beat_detected = true; 
+          new_beat_this_frame = true;
+        }
+      }
+      return new_beat_this_frame;
     }
 
     function swapBackground() {
