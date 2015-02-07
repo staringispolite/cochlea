@@ -109,7 +109,7 @@ $(document).ready(function() {
         var array =  new Uint8Array(analyser.frequencyBinCount);
         analyser.getByteFrequencyData(array);
         // clear the current state
-        ctx.clearRect(0, 0, 1000, 325);
+        ctx.clearRect(0, 0, 400, 325);
         // set the fill style
         ctx.fillStyle=gradient;
         drawSpectrum(array);
@@ -153,7 +153,7 @@ $(document).ready(function() {
     }
 
     function swapBackground() {
-      active_bg_color_idx = (active_bg_color_idx + 1) % BG_COLORS.length;
+      active_bg_color_idx = (active_bg_color_idx + 2) % BG_COLORS.length;
       $('body').css('background-color', BG_COLORS[active_bg_color_idx]);
     }
 
