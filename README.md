@@ -1,2 +1,4 @@
-# cochlea
-A configurable spectrum-band and beat-detection visualizer
+# Cochlea
+## A configurable spectrum-band and beat-detection visualizer
+
+
