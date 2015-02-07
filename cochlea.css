@@ -1,8 +1,16 @@
 body {
-  background-color: #F6989D;
+  background-color: #82CA9D;
   text-align: center;
   font-family: "Helvetica Neue", Helvetica, Arial, freesans, sans-serif;
   color: #EBEBEB;
+}
+
+h1 {
+  margin-bottom: 10px;
+}
+
+h3 {
+  margin: 0 0 10px 0;
 }
 
 #canvas {
@@ -11,8 +19,8 @@ body {
 }
 
 #controls {
-  width: 32px;
-  height: 32px;
+  width: 64px;
+  height: 64px;
   margin: 0 auto;
   background-image: url('img/play-icon-256.png');
   background-size: contain;
@@ -24,7 +32,7 @@ body {
 
 .footer {
   text-align: center;
-  margin-top: 200px;
+  margin-top: 160px;
 }
 
 .footer a {
