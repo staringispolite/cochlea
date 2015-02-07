@@ -29,6 +29,7 @@ $(document).ready(function() {
 
     // load the sound
     setupAudioNodes();
+    loadSound(songURL, isPreload=true);
 
     // Beat detection variables
     var beat_detected = true; 
@@ -72,7 +73,7 @@ $(document).ready(function() {
     }
 
     // load the specified sound
-    function loadSound(url) {
+    function loadSound(url, isPreload) {
         // create a buffer source node
         sourceNode = context.createBufferSource();
         sourceNode.connect(analyser);
@@ -88,7 +89,9 @@ $(document).ready(function() {
             context.decodeAudioData(request.response, function(buffer) {
                 // when the audio is decoded play the sound
                 console.log('success!')
-                initSound(buffer);
+                if (!isPreload) {
+                  initSound(buffer);
+                }
             }, onError);
         }
         request.send();
