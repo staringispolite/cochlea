@@ -10,6 +10,18 @@ body {
   margin: 0 auto;
 }
 
+#controls {
+  width: 32px;
+  height: 32px;
+  margin: 0 auto;
+  background-image: url('img/play-icon-256.png');
+  background-size: contain;
+}
+
+#controls.playing {
+  background-image: url('img/stop-icon-256.png');
+}
+
 .footer {
   text-align: center;
   margin-top: 200px;

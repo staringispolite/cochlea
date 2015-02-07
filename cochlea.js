@@ -12,6 +12,8 @@ $(document).ready(function() {
     var sourceNode;
     var analyser;
     var javascriptNode;
+    var audioPlaying = false;
+    var songURL = "demo.mp3";
 
     // get the context from the canvas to draw on
     var ctx = $("#canvas").get(0).getContext("2d");
@@ -27,14 +29,11 @@ $(document).ready(function() {
 
     // load the sound
     setupAudioNodes();
-    loadSound("demo.mp3");
-    console.log('sound loaded');
 
     // Beat detection variables
     var beat_detected = true; 
     var beat_detect_band = 10;       // 10 3rd-to-last band we see.
     var beat_detect_threshold = 150; // Out of 255;
-
 
     // Visualization globals
     var active_bg_color_idx = 0;
@@ -58,6 +57,9 @@ $(document).ready(function() {
       "#F6989D"
     ];
 
+    // Set up click events.
+    $('#controls').click(togglePlayback);
+
     function setupAudioNodes() {
         // setup a javascript node
         javascriptNode = context.createScriptProcessor(2048, 1, 1);
@@ -67,15 +69,16 @@ $(document).ready(function() {
         analyser = context.createAnalyser();
         analyser.smoothingTimeConstant = 0.3;
         analyser.fftSize = 32;
+    }
+
+    // load the specified sound
+    function loadSound(url) {
         // create a buffer source node
         sourceNode = context.createBufferSource();
         sourceNode.connect(analyser);
         analyser.connect(javascriptNode);
         sourceNode.connect(context.destination);
-    }
 
-    // load the specified sound
-    function loadSound(url) {
         var request = new XMLHttpRequest();
         request.open('GET', url, true);
         request.responseType = 'arraybuffer';
@@ -85,15 +88,32 @@ $(document).ready(function() {
             context.decodeAudioData(request.response, function(buffer) {
                 // when the audio is decoded play the sound
                 console.log('success!')
-                playSound(buffer);
+                initSound(buffer);
             }, onError);
         }
         request.send();
     }
 
-    function playSound(buffer) {
-        sourceNode.buffer = buffer;
-        sourceNode.start(0);
+    function initSound(buffer) {
+      sourceNode.buffer = buffer;
+      audioPlaying = true;
+      sourceNode.start();
+      $('#controls').addClass('playing');
+    }
+
+    function stopSound() {
+      audioPlaying = false;
+      sourceNode.stop();
+      $('#controls').removeClass('playing');
+    }
+
+    function togglePlayback() {
+      if (audioPlaying) {
+        stopSound();
+      } else {
+        // Can't unpause a AudioBufferSourceNode :(
+        loadSound(songURL); 
+      }
     }
 
     // log if an error occurs
