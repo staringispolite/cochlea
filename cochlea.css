@@ -1,0 +1,19 @@
+body {
+  background-color: #F6989D;
+  text-align: center;
+  font-family: "Helvetica Neue", Helvetica, Arial, freesans, sans-serif;
+}
+
+#canvas {
+  display: block;
+  margin: 0 auto;
+}
+
+.footer {
+  text-align: center;
+  color: #EBEBEB;
+}
+
+.footer a {
+  color: #D7D7D7;
+}
