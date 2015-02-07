@@ -59,7 +59,7 @@ $(document).ready(function() {
     ];
 
     // Set up click events.
-    $('#controls').click(togglePlayback);
+    $('#playback').click(togglePlayback);
 
     function setupAudioNodes() {
         // setup a javascript node
@@ -101,13 +101,13 @@ $(document).ready(function() {
       sourceNode.buffer = buffer;
       audioPlaying = true;
       sourceNode.start();
-      $('#controls').addClass('playing');
+      $('#playback').addClass('playing');
     }
 
     function stopSound() {
       audioPlaying = false;
       sourceNode.stop();
-      $('#controls').removeClass('playing');
+      $('#playback').removeClass('playing');
     }
 
     function togglePlayback() {

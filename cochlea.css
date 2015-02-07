@@ -23,7 +23,7 @@ h3 {
   margin: 0 auto;
 }
 
-#controls {
+#playback {
   width: 64px;
   height: 64px;
   margin: 0 auto;
@@ -32,7 +32,7 @@ h3 {
   cursor: pointer;
 }
 
-#controls.playing {
+#playback.playing {
   background-image: url('img/stop-icon-256.png');
 }
 
