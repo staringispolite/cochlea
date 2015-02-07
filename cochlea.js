@@ -19,10 +19,11 @@ $(document).ready(function() {
     // offset, since the gradient is calculated based on
     // the canvas, not the specific element we draw
     var gradient = ctx.createLinearGradient(0,0,0,300);
-    gradient.addColorStop(1,'#000000');
-    gradient.addColorStop(0.75,'#ff0000');
-    gradient.addColorStop(0.25,'#ffff00');
-    gradient.addColorStop(0,'#ffffff');
+    gradient.addColorStop(1,'#D7D7D7');
+    gradient.addColorStop(0,'#FFFFFF');
+    var beat_detect_gradient = ctx.createLinearGradient(0,0,0,300);
+    beat_detect_gradient.addColorStop(1,'#C2C2C2');
+    beat_detect_gradient.addColorStop(0,'#FFFFFF');
 
     // load the sound
     setupAudioNodes();
@@ -110,8 +111,6 @@ $(document).ready(function() {
         analyser.getByteFrequencyData(array);
         // clear the current state
         ctx.clearRect(0, 0, 400, 325);
-        // set the fill style
-        ctx.fillStyle=gradient;
         drawSpectrum(array);
         if (detectBeat(array)) {
           swapBackground();
@@ -119,12 +118,22 @@ $(document).ready(function() {
     }
 
     function drawSpectrum(array) {
-        for ( var i = 0; i < (array.length); i+=2 ){
-            var value = array[i];
-            // TODO: Change to gradient of white/grey?
-            ctx.fillRect(i*25,325-value,20,325);
-            //  console.log([i,value])
+      for ( var i = 0; i < (array.length); i+=2 ){
+        if (i == beat_detect_band) {
+          // Set the beat detecting fill style.
+          ctx.fillStyle = beat_detect_gradient;
+        } else {
+          // Set the fill style.
+          ctx.fillStyle = gradient;
         }
+        // Draw the EQ bar.
+        var value = array[i];
+        ctx.fillRect(i*25,325-value,20,325);
+        //  console.log([i,value])
+      }
+      // Now draw a line to show the threshold value.
+      var yVal = 325-beat_detect_threshold;
+      ctx.fillRect(0, yVal, 400, 1);
     };
 
     /**
