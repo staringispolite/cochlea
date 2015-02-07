@@ -23,6 +23,11 @@ h3 {
   margin: 0 auto;
 }
 
+#controls {
+  margin: 0 auto;
+  width: 148px;
+}
+
 #playback {
   width: 64px;
   height: 64px;
@@ -30,10 +35,20 @@ h3 {
   background-image: url('img/play-icon-256.png');
   background-size: contain;
   cursor: pointer;
+  float: left;
 }
 
 #playback.playing {
   background-image: url('img/stop-icon-256.png');
+}
+
+#next {
+  width: 58px;
+  height: 64px;
+  margin: 0 auto 0 84px;
+  background-image: url('img/next-icon-256.png');
+  background-size: contain;
+  cursor: pointer;
 }
 
 .footer {

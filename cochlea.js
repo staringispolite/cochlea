@@ -13,7 +13,6 @@ $(document).ready(function() {
     var analyser;
     var javascriptNode;
     var audioPlaying = false;
-    var songURL = "demo.mp3";
 
     // get the context from the canvas to draw on
     var ctx = $("#canvas").get(0).getContext("2d");
@@ -26,10 +25,6 @@ $(document).ready(function() {
     var beat_detect_gradient = ctx.createLinearGradient(0,0,0,300);
     beat_detect_gradient.addColorStop(1,'#C2C2C2');
     beat_detect_gradient.addColorStop(0,'#FFFFFF');
-
-    // load the sound
-    setupAudioNodes();
-    loadSound(songURL, isPreload=true);
 
     // Beat detection variables
     var beat_detected = true; 
@@ -58,8 +53,20 @@ $(document).ready(function() {
       "#F6989D"
     ];
 
+    // track list.
+    var activeTrackID = 0;
+    var TRACKLIST = [
+      "demo.mp3",
+      "uptown.mp3"
+    ];
+
+    // load the sound
+    setupAudioNodes();
+    loadSound(TRACKLIST[activeTrackID], isPreload=true);
+
     // Set up click events.
     $('#playback').click(togglePlayback);
+    $('#next').click(nextSound);
 
     function setupAudioNodes() {
         // setup a javascript node
@@ -115,8 +122,22 @@ $(document).ready(function() {
         stopSound();
       } else {
         // Can't unpause a AudioBufferSourceNode :(
-        loadSound(songURL); 
+        loadSound(TRACKLIST[activeTrackID]); 
       }
+    }
+
+    function nextSound() {
+      //var newURL = prompt("Enter URL of a new song to play");
+      //if (newURL !== undefined) {
+      //  songURL = newURL;
+      //}
+      activeTrackID = (activeTrackID + 1) % TRACKLIST.length;
+      if (audioPlaying) {
+        // Only stop first if already playing.
+        togglePlayback();
+      }
+      // Now play (which will load newly-updated songURL.
+      togglePlayback();
     }
 
     // log if an error occurs
