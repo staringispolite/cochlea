@@ -7,12 +7,13 @@ $(document).ready(function() {
         }
         window.AudioContext = window.webkitAudioContext;
     }
-    var context = new AudioContext();
+    var context;
     var audioBuffer;
     var sourceNode;
     var analyser;
     var javascriptNode;
     var audioPlaying = false;
+    var audioNodesSetUp = false;
 
     // get the context from the canvas to draw on
     var ctx = $("#canvas").get(0).getContext("2d");
@@ -61,7 +62,6 @@ $(document).ready(function() {
     ];
 
     // load the sound
-    setupAudioNodes();
     loadSound(TRACKLIST[activeTrackID], isPreload=true);
 
     // Set up click events.
@@ -69,6 +69,11 @@ $(document).ready(function() {
     $('#next').click(nextSound);
 
     function setupAudioNodes() {
+      if (!audioNodesSetUp) {
+        // Hack to get load audio contexts from USER event not WINDOW event
+        // because of restriction in mobile Safari/iOS.
+        context = new AudioContext();
+
         // setup a javascript node
         javascriptNode = context.createScriptProcessor(2048, 1, 1);
         // connect to destination, else it isn't called
@@ -77,10 +82,16 @@ $(document).ready(function() {
         analyser = context.createAnalyser();
         analyser.smoothingTimeConstant = 0.3;
         analyser.fftSize = 32;
+
+        // Mark as done (via first user event). Don't need to do again.
+        audioNodesSetUp = true;
+      }
     }
 
     // load the specified sound
     function loadSound(url, isPreload) {
+        setupAudioNodes();
+
         // create a buffer source node
         sourceNode = context.createBufferSource();
         sourceNode.connect(analyser);
