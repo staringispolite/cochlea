@@ -107,13 +107,13 @@ $(document).ready(function() {
     function initSound(buffer) {
       sourceNode.buffer = buffer;
       audioPlaying = true;
-      sourceNode.start();
+      sourceNode.start(0);
       $('#playback').addClass('playing');
     }
 
     function stopSound() {
       audioPlaying = false;
-      sourceNode.stop();
+      sourceNode.stop(0);
       $('#playback').removeClass('playing');
     }
 
