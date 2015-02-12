@@ -14,6 +14,10 @@ $(document).ready(function() {
     var javascriptNode;
     var audioPlaying = false;
     var audioNodesSetUp = false;
+    var timeData = {
+      startTime: 0,     // Starting time of playback
+      beatTimecodes: [] // Array of [beatTime-startTime]
+    };
 
     // get the context from the canvas to draw on
     var ctx = $("#canvas").get(0).getContext("2d");
@@ -27,10 +31,15 @@ $(document).ready(function() {
     beat_detect_gradient.addColorStop(1,'#C2C2C2');
     beat_detect_gradient.addColorStop(0,'#FFFFFF');
 
-    // Beat detection variables
+    // Beat detection with Dendrite
+    var beatDetector = new Dendrite();
+    var beatDetectBand = 10;       // 3rd-to-last band we see.
+    var beatDetectThreshold = 150; // Out of 255. Eyeballed this.
+    beatDetector.setFrequencyBand(beatDetectBand);
+    beatDetector.setThreshold(beatDetectThreshold);
+    beatDetector.onBeatDetected(swapBackground);
+    beatDetector.onBeatDetected(registerBeatDetected);
     var beat_detected = true; 
-    var beat_detect_band = 10;       // 10 3rd-to-last band we see.
-    var beat_detect_threshold = 150; // Out of 255;
 
     // Visualization globals
     var active_bg_color_idx = 0;
@@ -101,6 +110,7 @@ $(document).ready(function() {
       var request = new XMLHttpRequest();
       request.open('GET', url, true);
       request.responseType = 'arraybuffer';
+
       // When loaded decode the data
       request.onload = function() {
         // decode the data
@@ -118,6 +128,8 @@ $(document).ready(function() {
     function initSound(buffer) {
       sourceNode.buffer = buffer;
       audioPlaying = true;
+      resetBeatsDetected();
+      timeData.startTime = Date.now();
       sourceNode.start(0);
       $('#playback').addClass('playing');
     }
@@ -126,6 +138,7 @@ $(document).ready(function() {
       audioPlaying = false;
       sourceNode.stop(0);
       $('#playback').removeClass('playing');
+      printBeatsDetected();
     }
 
     function togglePlayback() {
@@ -147,7 +160,7 @@ $(document).ready(function() {
         // Only stop first if already playing.
         togglePlayback();
       }
-      // Now play (which will load newly-updated songURL.
+      // Now play (which will load newly-updated songURL).
       togglePlayback();
     }
 
@@ -167,14 +180,33 @@ $(document).ready(function() {
       // clear the current state
       ctx.clearRect(0, 0, 400, 325);
       drawSpectrum(array);
-      if (detectBeat(array)) {
-        swapBackground();
-      }
+      beatDetector.process(array);
+    };
+
+    /**
+     * Callback to store array of beats detected.
+     */
+    function registerBeatDetected(array, beatTime) {
+      var timeCode = beatTime - timeData.startTime;
+      //console.log('beat detected at ' + timeCode);
+      timeData.beatTimecodes.push(timeCode);
     }
 
+    function resetBeatsDetected() {
+      timeData.beatTimecodes = [];
+    }
+
+    function printBeatsDetected() {
+      console.log('beats detected at the following ms offsets: ' +
+          timeData.beatTimecodes);
+    }
+
+    /**
+     * Draw the EQ spectrum lines, given one frame of audio.
+     */
     function drawSpectrum(array) {
       for ( var i = 0; i < (array.length); i+=2 ){
-        if (i == beat_detect_band) {
+        if (i == beatDetectBand) {
           // Set the beat detecting fill style.
           ctx.fillStyle = beat_detect_gradient;
         } else {
@@ -184,39 +216,16 @@ $(document).ready(function() {
         // Draw the EQ bar.
         var value = array[i];
         ctx.fillRect(i*25,325-value,20,325);
-        //  console.log([i,value])
       }
       // Now draw a line to show the threshold value.
-      var yVal = 325-beat_detect_threshold;
+      var yVal = 325-beatDetectThreshold;
       ctx.fillRect(0, yVal, 400, 1);
     };
 
     /**
-     * A "beat" is defined by volume of a particular band of spectrum
-     * rising above a certain line. They're on 0-255 scale.
-     * TODO: Figure out best band to use
-     * TODO: Only swap on the "upswing", and ignore detection until after
-     * it drops below that threshold again (otherwise seizure mode every frame
-     * while the volume is above.
-     * TODO: Need to do a moving average to smooth things out...?
+     * Redraw the background color in response to the beat detection.
      */
-    function detectBeat(array) {
-      var new_beat_this_frame = false;
-      if (beat_detected) {
-        // Wait for band to go below threshold and un-mark 
-        if (array[beat_detect_band] < beat_detect_threshold) {
-          beat_detected = false; 
-        }
-      } else {
-        if (array[beat_detect_band] > beat_detect_threshold) {
-          beat_detected = true; 
-          new_beat_this_frame = true;
-        }
-      }
-      return new_beat_this_frame;
-    }
-
-    function swapBackground() {
+    function swapBackground(array, timestamp) {
       active_bg_color_idx = (active_bg_color_idx + 2) % BG_COLORS.length;
       $('body').css('background-color', BG_COLORS[active_bg_color_idx]);
     }
