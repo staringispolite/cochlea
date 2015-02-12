@@ -2,10 +2,10 @@
 $(document).ready(function() {
     // create the audio context (chrome only for now)
     if (! window.AudioContext) {
-        if (! window.webkitAudioContext) {
-            alert('no audiocontext found');
-        }
-        window.AudioContext = window.webkitAudioContext;
+      if (! window.webkitAudioContext) {
+          alert('no audiocontext found');
+      }
+      window.AudioContext = window.webkitAudioContext;
     }
     var context;
     var audioBuffer;
@@ -90,29 +90,29 @@ $(document).ready(function() {
 
     // load the specified sound
     function loadSound(url, isPreload) {
-        setupAudioNodes();
+      setupAudioNodes();
 
-        // create a buffer source node
-        sourceNode = context.createBufferSource();
-        sourceNode.connect(analyser);
-        analyser.connect(javascriptNode);
-        sourceNode.connect(context.destination);
+      // create a buffer source node
+      sourceNode = context.createBufferSource();
+      sourceNode.connect(analyser);
+      analyser.connect(javascriptNode);
+      sourceNode.connect(context.destination);
 
-        var request = new XMLHttpRequest();
-        request.open('GET', url, true);
-        request.responseType = 'arraybuffer';
-        // When loaded decode the data
-        request.onload = function() {
-            // decode the data
-            context.decodeAudioData(request.response, function(buffer) {
-                // when the audio is decoded play the sound
-                console.log('success!')
-                if (!isPreload) {
-                  initSound(buffer);
-                }
-            }, onError);
-        }
-        request.send();
+      var request = new XMLHttpRequest();
+      request.open('GET', url, true);
+      request.responseType = 'arraybuffer';
+      // When loaded decode the data
+      request.onload = function() {
+        // decode the data
+        context.decodeAudioData(request.response, function(buffer) {
+          // when the audio is decoded play the sound
+          console.log('success!')
+          if (!isPreload) {
+            initSound(buffer);
+          }
+        }, onError);
+      }
+      request.send();
     }
 
     function initSound(buffer) {
@@ -153,23 +153,23 @@ $(document).ready(function() {
 
     // log if an error occurs
     function onError(e) {
-        console.log("Error!");
-        console.log(e);
+      console.log("Error!");
+      console.log(e);
     }
 
     // when the javascript node is called
     // we use information from the analyzer node
     // to draw the volume
     javascriptNode.onaudioprocess = function() {
-        // get the average for the first channel
-        var array =  new Uint8Array(analyser.frequencyBinCount);
-        analyser.getByteFrequencyData(array);
-        // clear the current state
-        ctx.clearRect(0, 0, 400, 325);
-        drawSpectrum(array);
-        if (detectBeat(array)) {
-          swapBackground();
-        }
+      // get the average for the first channel
+      var array =  new Uint8Array(analyser.frequencyBinCount);
+      analyser.getByteFrequencyData(array);
+      // clear the current state
+      ctx.clearRect(0, 0, 400, 325);
+      drawSpectrum(array);
+      if (detectBeat(array)) {
+        swapBackground();
+      }
     }
 
     function drawSpectrum(array) {
