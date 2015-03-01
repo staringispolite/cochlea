@@ -1,4 +1,4 @@
-//Waituntil DOM is loaded to start
+// Wait until DOM is loaded to start
 $(document).ready(function() {
     // create the audio context (chrome only for now)
     if (! window.AudioContext) {
@@ -12,8 +12,11 @@ $(document).ready(function() {
     var sourceNode;
     var analyser;
     var javascriptNode;
+    var microphoneStream = null;
+    var gainNode = null;
     var audioPlaying = false;
     var audioNodesSetUp = false;
+    var use_mic = false;
     var timeData = {
       startTime: 0,     // Starting time of playback
       beatTimecodes: [] // Array of [beatTime-startTime]
@@ -31,7 +34,7 @@ $(document).ready(function() {
     beat_detect_gradient.addColorStop(1,'#C2C2C2');
     beat_detect_gradient.addColorStop(0,'#FFFFFF');
 
-    // Beat detection with Dendrite
+    // Beat detection with Dendrite.
     var beatDetector = new Dendrite();
     var beatDetectBand = 10;       // 3rd-to-last band we see.
     var beatDetectThreshold = 150; // Out of 255. Eyeballed this.
@@ -74,9 +77,14 @@ $(document).ready(function() {
     loadSound(TRACKLIST[activeTrackID], isPreload=true);
 
     // Set up click events.
+    $('#mic').click(toggleMicrophone);
     $('#playback').click(togglePlayback);
     $('#next').click(nextSound);
 
+    // TODO: Clean up creation of AudioNodes (either singletons or
+    // garbage collect them). If you swap back and forth between
+    // microphone and mp3 analysis, you get ghosting from multiple
+    // nodes drawing almost-identical graphs.
     function setupAudioNodes() {
       if (!audioNodesSetUp) {
         // Hack to get load audio contexts from USER event not WINDOW event
@@ -92,10 +100,82 @@ $(document).ready(function() {
         analyser.smoothingTimeConstant = 0.3;
         analyser.fftSize = 32;
 
+        javascriptNode.onaudioprocess = function() {
+          // get the average for the first channel
+          var array =  new Uint8Array(analyser.frequencyBinCount);
+          analyser.getByteFrequencyData(array);
+          // clear the current state
+          ctx.clearRect(0, 0, 400, 325);
+          drawSpectrum(array);
+          beatDetector.process(array);
+        };
+
         // Mark as done (via first user event). Don't need to do again.
         audioNodesSetUp = true;
       }
     }
+ 
+    /**
+     * Microphone code from
+     * http://stackoverflow.com/questions/26532328/how-do-i-get-audio-data-from-my-microphone-using-audiocontext-html5
+     */
+    function setupMicrophoneBuffer() {
+      if (!navigator.getUserMedia) {
+        navigator.getUserMedia =
+            navigator.getUserMedia || navigator.webkitGetUserMedia ||
+            navigator.mozGetUserMedia || navigator.msGetUserMedia;
+      }
+
+      if (navigator.getUserMedia) {
+        navigator.getUserMedia(
+          {audio:true},
+          function(stream) {
+            startMicrophone(stream);
+          },
+          function(e) {
+            alert('Error capturing audio.');
+          }
+        );
+      } else {
+        alert('getUserMedia not supported in this browser.');
+      };
+    }
+
+    function startMicrophone(stream){
+      var BUFF_SIZE = 16384;
+      microphoneStream = context.createMediaStreamSource(stream);
+
+      // Comment out to disconnect output speakers. Everything else will
+      // work OK this eliminates possibility of feedback squealing or
+      // leave it in and turn down the volume.
+      gainNode = context.createGain();
+      //microphoneStream.connect(gainNode);
+
+      // --- setup FFT
+      javascriptNode = context.createScriptProcessor(2048, 1, 1);
+      analyser = context.createAnalyser();
+      analyser.smoothingTimeConstant = 0;
+      analyser.fftSize = 32;
+
+      gainNode.connect(context.destination);
+      javascriptNode.connect(gainNode);
+      analyser.connect(javascriptNode);
+      microphoneStream.connect(analyser);
+
+      javascriptNode.onaudioprocess = function() {  // FFT in frequency domain
+        var array = new Uint8Array(analyser.frequencyBinCount);
+        analyser.getByteFrequencyData(array);
+
+        // Draw the spectrum.
+        ctx.clearRect(0, 0, 400, 325);
+        drawSpectrum(array);
+        beatDetector.process(array);
+      }
+    }
+
+    /**
+     * End microphone code from Stackoverflow.
+     */
 
     // load the specified sound
     function loadSound(url, isPreload) {
@@ -145,8 +225,35 @@ $(document).ready(function() {
       if (audioPlaying) {
         stopSound();
       } else {
+        if (use_mic) {
+          toggleMicrophone();
+        }
         // Can't unpause a AudioBufferSourceNode :(
         loadSound(TRACKLIST[activeTrackID]); 
+      }
+    }
+
+    function toggleMicrophone() {
+      if (use_mic) {
+        // Turn off microphone.
+        microphoneStream.disconnect();
+
+        // Update UI.
+        $('#mic').removeClass('playing');
+        use_mic = false;
+      } else {
+        // Stop playback if it's happening.
+        if (audioPlaying) {
+          togglePlayback();
+        }
+
+        // Turn on microphone.
+        setupAudioNodes();
+        setupMicrophoneBuffer();
+
+        // Update UI.
+        $('#mic').addClass('playing');
+        use_mic = true;
       }
     }
 
@@ -173,15 +280,8 @@ $(document).ready(function() {
     // when the javascript node is called
     // we use information from the analyzer node
     // to draw the volume
-    javascriptNode.onaudioprocess = function() {
-      // get the average for the first channel
-      var array =  new Uint8Array(analyser.frequencyBinCount);
-      analyser.getByteFrequencyData(array);
-      // clear the current state
-      ctx.clearRect(0, 0, 400, 325);
-      drawSpectrum(array);
-      beatDetector.process(array);
-    };
+    if (!use_mic) {
+    }
 
     /**
      * Callback to store array of beats detected.
