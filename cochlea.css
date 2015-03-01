@@ -25,7 +25,22 @@ h3 {
 
 #controls {
   margin: 0 auto;
-  width: 148px;
+  width: 212px;
+  overflow: auto;
+}
+
+#mic {
+  width: 64px;
+  height: 64px;
+  margin: 0 auto;
+  background-image: url('img/mic-icon-256.png');
+  background-size: contain;
+  cursor: pointer;
+  float: left;
+}
+
+#mic.playing {
+  background-image: url('img/mic-rec-icon-256.png');
 }
 
 #playback {
@@ -45,10 +60,11 @@ h3 {
 #next {
   width: 58px;
   height: 64px;
-  margin: 0 auto 0 84px;
+  margin: 0 auto 0;
   background-image: url('img/next-icon-256.png');
   background-size: contain;
   cursor: pointer;
+  float: left;
 }
 
 .footer {
