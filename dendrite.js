@@ -12,12 +12,13 @@
 var Dendrite = function() {
 
   var onBeatDetectedCallbacks = [];
+  var onBeatEndedCallbacks = [];
   var beatDetected = true; 
   var beatDetectBand = 10;       // 10 3rd-to-last band we see.
   var beatDetectThreshold = 150; // Out of 255;
 
   /**
-   * When a beat is detected, trigger the callbacks
+   * When the 'beginning' of a beat is detected, trigger the callbacks
    */
   function triggerBeatDetected(array, timestamp) {
     for (i = 0; i < onBeatDetectedCallbacks.length; i++) {
@@ -27,6 +28,17 @@ var Dendrite = function() {
     }
   }
      
+  /**
+   * When the 'end' of a beat is detected, trigger the callbacks
+   */
+  function triggerBeatEnded(array, timestamp) {
+    for (i = 0; i < onBeatEndedCallbacks.length; i++) {
+      if (onBeatEndedCallbacks[i] !== undefined) {
+        onBeatEndedCallbacks[i](array, timestamp);
+      }
+    }
+  }
+
   var publicInterface = {
 
     setFrequencyBand: function(newBand) {
@@ -41,6 +53,10 @@ var Dendrite = function() {
       onBeatDetectedCallbacks.push(callback);
     },
 
+    onBeatEnded: function(callback) {
+      onBeatEndedCallbacks.push(callback);
+    },
+
     /**
      * A "beat" is defined by volume of a particular band of spectrum
      * rising above a certain line. They're on 0-255 scale.
@@ -51,6 +67,7 @@ var Dendrite = function() {
         // Wait for band to go below threshold and un-mark 
         if (array[beatDetectBand] < beatDetectThreshold) {
           beatDetected = false; 
+          triggerBeatEnded(array, Date.now());
         }
       } else {
         if (array[beatDetectBand] > beatDetectThreshold) {
