@@ -22,6 +22,11 @@ $(document).ready(function() {
       beatTimecodes: [] // Array of [beatTime-startTime]
     };
 
+    // For controlling the background response.
+    var BG_STYLE_COLORS = 0;
+    var BG_STYLE_GIFS = 1;
+    var bgStyle = BG_STYLE_COLORS;
+
     // get the context from the canvas to draw on
     var ctx = $("#canvas").get(0).getContext("2d");
     // create a gradient for the fill. Note the strange
@@ -77,6 +82,7 @@ $(document).ready(function() {
     loadSound(TRACKLIST[activeTrackID], isPreload=true);
 
     // Set up click events.
+    $('#background').click(toggleBackground);
     $('#mic').click(toggleMicrophone);
     $('#playback').click(togglePlayback);
     $('#next').click(nextSound);
@@ -219,6 +225,21 @@ $(document).ready(function() {
       sourceNode.stop(0);
       $('#playback').removeClass('playing');
       printBeatsDetected();
+    }
+
+    function toggleBackground() {
+      if (bgStyle == BG_STYLE_GIFS) {
+        // Set to colors
+        bgStyle = BG_STYLE_COLORS;
+        // Update UI.
+        $('#background').removeClass('showing-gif');
+      } else {
+        // Set to gifs
+        bgStyle = BG_STYLE_GIFS;
+        // Update UI.
+        $('#background').addClass('showing-gif');
+        // TODO: Prompt query for gif search
+      }
     }
 
     function togglePlayback() {

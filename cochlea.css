@@ -25,8 +25,22 @@ h3 {
 
 #controls {
   margin: 0 auto;
-  width: 212px;
+  width: 276px;
   overflow: auto;
+}
+
+#background {
+  width: 64px;
+  height: 64px;
+  margin: 0 auto;
+  background-image: url('img/bg-gif-icon-256.png');
+  background-size: contain;
+  cursor: pointer;
+  float: left;
+}
+
+#background.showing-gif {
+  background-image: url('img/bg-color-icon-256.png');
 }
 
 #mic {
