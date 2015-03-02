@@ -1,5 +1,6 @@
 body {
   background-color: #82CA9D;
+  background-size: cover;
   text-align: center;
   font-family: "Helvetica Neue", Helvetica, Arial, freesans, sans-serif;
   color: #EBEBEB;
@@ -25,7 +26,7 @@ h3 {
 
 #controls {
   margin: 0 auto;
-  width: 212px;
+  width: 276px;
   overflow: auto;
 }
 

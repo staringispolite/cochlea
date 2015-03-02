@@ -26,6 +26,8 @@ $(document).ready(function() {
     var BG_STYLE_COLORS = 0;
     var BG_STYLE_GIFS = 1;
     var bgStyle = BG_STYLE_COLORS;
+    var gifSet = [];
+    var activeBgGifIndex = 0;
 
     // get the context from the canvas to draw on
     var ctx = $("#canvas").get(0).getContext("2d");
@@ -106,6 +108,9 @@ $(document).ready(function() {
         analyser.smoothingTimeConstant = 0.3;
         analyser.fftSize = 32;
 
+        // When the javascript node is called
+        // we use information from the analyzer node
+        // to draw the volume
         javascriptNode.onaudioprocess = function() {
           // get the average for the first channel
           var array =  new Uint8Array(analyser.frequencyBinCount);
@@ -239,7 +244,36 @@ $(document).ready(function() {
         // Update UI.
         $('#background').addClass('showing-gif');
         // TODO: Prompt query for gif search
+        giphySearch('party');
       }
+    }
+
+    // From Giphy's API reference: https://github.com/Giphy/GiphyAPI
+    // and RaveRobot: https://github.com/simplecasual/raverobot.com
+    function giphySearch(query) {
+      var xhr = $.get("https://api.giphy.com/v1/gifs/search?q=" + query + "&api_key=dc6zaTOxFJmzC&limit=200");
+      xhr.done(function(data) { 
+        var loading = [];
+        var gifURL = "";
+        for (var i = 0; i < data.data.length; i++) {
+          gifURL = "https://media2.giphy.com/media/" + data.data[i].id + "/giphy.gif"
+          //console.log(gifURL);
+          loading.push(gifURL); 
+        }
+        var numLoaded = 0;
+        var nextGifset = [];
+        $(loading).each(function (i, uri) {
+          var img = new Image();
+          img.src = uri;
+          nextGifset.push(uri);
+          $(img).load(function() {
+            if (numLoaded == 0) {
+              gifSet = nextGifset;
+            }
+            numLoaded++;
+          });
+        });
+      });
     }
 
     function togglePlayback() {
@@ -298,12 +332,6 @@ $(document).ready(function() {
       console.log(e);
     }
 
-    // when the javascript node is called
-    // we use information from the analyzer node
-    // to draw the volume
-    if (!use_mic) {
-    }
-
     /**
      * Callback to store array of beats detected.
      */
@@ -347,8 +375,18 @@ $(document).ready(function() {
      * Redraw the background color in response to the beat detection.
      */
     function swapBackground(array, timestamp) {
-      active_bg_color_idx = (active_bg_color_idx + 2) % BG_COLORS.length;
-      $('body').css('background-color', BG_COLORS[active_bg_color_idx]);
+      if (bgStyle == BG_STYLE_COLORS) {
+        // Clear any existing background image.
+        $('body').css('background-image', '');
+        // Increment color ID by two. This gives more visual change per swap, and
+        // there's an odd number in the array, so 2nd time through is different.
+        active_bg_color_idx = (active_bg_color_idx + 2) % BG_COLORS.length;
+        $('body').css('background-color', BG_COLORS[active_bg_color_idx]);
+      } else {
+        // Increment to next gif.
+        activeBgGifIndex = (activeBgGifIndex + 1) % gifSet.length;
+        $('body').css('background-image', 'url(\'' + gifSet[activeBgGifIndex] + '\')');
+      }
     }
 
 });
