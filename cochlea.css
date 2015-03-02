@@ -26,7 +26,7 @@ h3 {
 
 #controls {
   margin: 0 auto;
-  width: 276px;
+  width: 266px;
   overflow: auto;
 }
 
@@ -47,7 +47,7 @@ h3 {
 #mic {
   width: 64px;
   height: 64px;
-  margin: 0 auto;
+  margin: 0 auto 0 5px;
   background-image: url('img/mic-icon-256.png');
   background-size: contain;
   cursor: pointer;
@@ -75,7 +75,7 @@ h3 {
 #next {
   width: 58px;
   height: 64px;
-  margin: 0 auto 0;
+  margin: 0 auto 0 5px;
   background-image: url('img/next-icon-256.png');
   background-size: contain;
   cursor: pointer;

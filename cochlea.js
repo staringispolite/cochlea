@@ -88,6 +88,7 @@ $(document).ready(function() {
     $('#mic').click(toggleMicrophone);
     $('#playback').click(togglePlayback);
     $('#next').click(nextSound);
+    updateUITitleText();
 
     // TODO: Clean up creation of AudioNodes (either singletons or
     // garbage collect them). If you swap back and forth between
@@ -127,7 +128,7 @@ $(document).ready(function() {
     }
  
     /**
-     * Microphone code from
+     * Microphone code adapted from StackOverflow.
      * http://stackoverflow.com/questions/26532328/how-do-i-get-audio-data-from-my-microphone-using-audiocontext-html5
      */
     function setupMicrophoneBuffer() {
@@ -222,7 +223,10 @@ $(document).ready(function() {
       resetBeatsDetected();
       timeData.startTime = Date.now();
       sourceNode.start(0);
+      // Update UI.
       $('#playback').addClass('playing');
+      updateUITitleText();  // Called in togglePlayback, but this call happens
+                            // in parallel, updates audioPlaying=true too late.
     }
 
     function stopSound() {
@@ -246,6 +250,7 @@ $(document).ready(function() {
         // TODO: Prompt query for gif search
         giphySearch('party');
       }
+      updateUITitleText();
     }
 
     // From Giphy's API reference: https://github.com/Giphy/GiphyAPI
@@ -278,14 +283,17 @@ $(document).ready(function() {
 
     function togglePlayback() {
       if (audioPlaying) {
+        // Stop playing from audio file.
         stopSound();
       } else {
+        // Start playing from audio file.
         if (use_mic) {
           toggleMicrophone();
         }
         // Can't unpause a AudioBufferSourceNode :(
         loadSound(TRACKLIST[activeTrackID]); 
       }
+      updateUITitleText();
     }
 
     function toggleMicrophone() {
@@ -310,6 +318,7 @@ $(document).ready(function() {
         $('#mic').addClass('playing');
         use_mic = true;
       }
+      updateUITitleText();
     }
 
     function nextSound() {
@@ -383,10 +392,41 @@ $(document).ready(function() {
         active_bg_color_idx = (active_bg_color_idx + 2) % BG_COLORS.length;
         $('body').css('background-color', BG_COLORS[active_bg_color_idx]);
       } else {
-        // Increment to next gif.
-        activeBgGifIndex = (activeBgGifIndex + 1) % gifSet.length;
-        $('body').css('background-image', 'url(\'' + gifSet[activeBgGifIndex] + '\')');
+        // Don't start gifSet lookups before the data comes back.
+        if (gifSet && (gifSet.length > 0)) {
+          // Increment to next gif.
+          activeBgGifIndex = (activeBgGifIndex + 1) % gifSet.length;
+          $('body').css('background-image', 'url(\'' + gifSet[activeBgGifIndex] + '\')');
+        }
       }
+    }
+
+    /**
+     * Keep the logic for title text here, so we can set them appropriately
+     * for each UI control, all in one place. Otherwise this is going to get
+     * messy
+     */
+    function updateUITitleText() {
+      // Set background (image vs color) button.
+      if (bgStyle == BG_STYLE_COLORS) {
+        $('#background').attr('title', 'Switch to GIF backgrounds');
+      } else {
+        $('#background').attr('title', 'Switch to color backgrounds');
+      }
+      // Set mic on/off button.
+      if (use_mic) {
+        $('#mic').attr('title', 'Switch to file detection');
+      } else {
+        $('#mic').attr('title', 'Switch to mic detection');
+      }
+      // Set play/pause button.
+      if (audioPlaying) {
+        $('#playback').attr('title', 'Stop');
+      } else {
+        $('#playback').attr('title', 'Play');
+      }
+      // Set next button.
+      $('#next').attr('title', 'Next audio clip');
     }
 
 });
