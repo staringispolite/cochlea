@@ -4,36 +4,76 @@
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
     <script type="text/javascript" src="dendrite.js"></script>
     <script type="text/javascript" src="cochlea.js"></script>
-    <link rel="stylesheet" type="text/css" href="cochlea.css">
-    <title>Cochlea - Beat detection Chrome demo in Javascript by Jonathan Howard</title>
+    <script type="text/javascript" src="http://d2v52k3cl9vedd.cloudfront.net/geomicons/0.2.0/geomicons.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="stylesheets/basscss.min.css">
+    <link rel="stylesheet" type="text/css" href="stylesheets/main.css">
+    <title>Cochlea - Beat detection Chrome demo</title>
   </head>
   <body>
-    <h1><a href="https://github.com/staringispolite/cochlea">Cochlea</a></h1>
-    <h3>Frequency banding and beat detection <a href="http://www.google.com/chrome/">Chrome</a> demo</h3>
-    <div id="controls">
-      <p id="background"></p>
-      <p id="mic"></p>
-      <p id="playback"></p>
-      <p id="next"></p>
-    </div>
-    <canvas id="canvas" width="400" height="325"></canvas>
-    <div class="footer">
-      <p>
-        frequency banding adapted by <a href="http://staringispolite.com/">Jonathan Howard</a>
-        from
-        <a href="http://www.smartjava.org/content/exploring-html5-web-audio-visualizing-sound">this article</a>.
-        code on
-        <a href="https://github.com/staringispolite/cochlea">Github</a>
-      </p>
-    </div>
+    <nav class="fixed top-0 left-0 bottom-0 bg-black bg-lighten-1 p2 col-2">
+      <header>
+        <h1 class="white h4 caps">Cochlea</h1>
+        <h2 class="gray regular h5">Frequency banding and beat detection Chrome demo</h2>
+      </header>
+      <hr>
+      <label class="h6 block bold caps mb1 gray">Visuals</label>
+      <div class="inline-block clearfix silver mb1">
+        <button type="button" class="left bg-darken-4 button-outline x-group-item
+          rounded-left">Gifs</button>
+        <button type="button" class="left gray button-outline x-group-item
+          rounded-right">Colors</button>
+      </div>
+      <input type="text" class="fit field-dark" placeholder="Search Giphy...">
+      <hr>
+      <label class="h6 block bold caps mb1 gray">Source</label>
+      <div class="inline-block clearfix silver mb1">
+        <button type="button" class="left bg-darken-4 button-outline x-group-item
+          rounded-left">MP3s</button>
+        <button type="button" class="left gray button-outline x-group-item
+          rounded-right">Microphone</button>
+      </div>
+      <label class="h6 block bold caps mb1 gray">Controls</label>
+      <div class="inline-block clearfix silver">
+        <button type="button" class="left button-outline x-group-item rounded-left">
+          <span class="js-geomicon geomicon" data-icon="play"></span>
+        </button>
+        <button type="button" class="left button-outline x-group-item
+          rounded-right">
+          <span class="js-geomicon geomicon" data-icon="next"></span>
+        </button>
+      </div>
+      <hr>
+      <label class="h6 block bold caps mb1 gray">Threshold</label>
+      <input type="range" class="fit mb2 range-light" value="1" min="0" max="100" tabindex="-1">
+
+      <label class="h6 block bold caps mb1 gray">Band</label>
+      <input type="range" class="fit mb2 range-light" value="1" min="0" max="100" tabindex="-1">
+      <hr>
+      <footer>
+        <a href="https://github.com/staringispolite/cochlea" class="silver">
+          <span class="js-geomicon geomicon mr2" data-icon="github"></span>
+        </a>
+        <a href="https://twitter.com/staringispolite" class="silver">
+          <span class="js-geomicon geomicon" data-icon="twitter"></span>
+        </a>
+      </footer>
+    </nav>
+    <article class="col-right col-10 bg-center bg-cover bg-olive fixed top-0
+      right-0 bottom-0">
+      <canvas id="canvas" class="absolute-center absolute" width="400" height="325"></canvas>
+    </article>
     <script>
       (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
       })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 
       ga('create', 'UA-59478672-1', 'auto');
       ga('send', 'pageview');
+    </script>
+    <script>
+      var icons = document.querySelectorAll('.js-geomicon');
+      Geomicons.inject(icons);
     </script>
   </body>
 </html>
