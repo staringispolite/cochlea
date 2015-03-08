@@ -17,38 +17,41 @@
       </header>
       <hr>
       <label class="h6 block bold caps mb1 gray">Visuals</label>
-      <div class="inline-block clearfix silver mb1">
+      <div class="inline-block clearfix silver mb1 js-button-group">
         <button type="button" class="left bg-darken-4 button-outline x-group-item
-          rounded-left">Gifs</button>
-        <button type="button" class="left gray button-outline x-group-item
-          rounded-right">Colors</button>
+          rounded-left">Colors</button>
+        <button id="background" type="button" class="left gray button-outline x-group-item
+          rounded-right">Gifs</button>
       </div>
-      <input type="text" class="fit field-dark" placeholder="Search Giphy...">
+      <!--<input type="text" class="fit field-dark" placeholder="Search
+      Giphy...">-->
       <hr>
       <label class="h6 block bold caps mb1 gray">Source</label>
-      <div class="inline-block clearfix silver mb1">
+      <div class="inline-block clearfix silver mb1 js-button-group">
         <button type="button" class="left bg-darken-4 button-outline x-group-item
           rounded-left">MP3s</button>
-        <button type="button" class="left gray button-outline x-group-item
+        <button type="button" id="mic" class="left gray button-outline x-group-item
           rounded-right">Microphone</button>
       </div>
       <label class="h6 block bold caps mb1 gray">Controls</label>
-      <div class="inline-block clearfix silver">
-        <button type="button" class="left button-outline x-group-item rounded-left">
+      <div class="inline-block clearfix silver js-button-group">
+        <button id="playback" type="button" class="left button-outline x-group-item rounded-left">
           <span class="js-geomicon geomicon" data-icon="play"></span>
         </button>
-        <button type="button" class="left button-outline x-group-item
+        <button id="next" type="button" class="left button-outline x-group-item
           rounded-right">
           <span class="js-geomicon geomicon" data-icon="next"></span>
         </button>
       </div>
       <hr>
+      <!--
       <label class="h6 block bold caps mb1 gray">Threshold</label>
       <input type="range" class="fit mb2 range-light" value="1" min="0" max="100" tabindex="-1">
 
       <label class="h6 block bold caps mb1 gray">Band</label>
       <input type="range" class="fit mb2 range-light" value="1" min="0" max="100" tabindex="-1">
       <hr>
+      -->
       <footer>
         <a href="https://github.com/staringispolite/cochlea" class="silver">
           <span class="js-geomicon geomicon mr2" data-icon="github"></span>
@@ -58,7 +61,7 @@
         </a>
       </footer>
     </nav>
-    <article class="col-right col-10 bg-center bg-cover bg-olive fixed top-0
+    <article class="bg-no-repeat js-background bg-olive col-right col-10 bg-cover fixed top-0
       right-0 bottom-0">
       <canvas id="canvas" class="absolute-center absolute" width="400" height="325"></canvas>
     </article>

@@ -1,5 +1,14 @@
 // Wait until DOM is loaded to start
 $(document).ready(function() {
+    // jQuery logic for handling button groups
+    $( ".js-button-group button" ).click(function() {
+      $(".js-button-group button").removeClass("bg-darken-4");
+      $(".js-button-group button").addClass("gray");
+
+      $(this).addClass("bg-darken-4");
+      $(this).removeClass("gray");
+    });
+
     // create the audio context (chrome only for now)
     if (! window.AudioContext) {
       if (! window.webkitAudioContext) {
@@ -386,17 +395,17 @@ $(document).ready(function() {
     function swapBackground(array, timestamp) {
       if (bgStyle == BG_STYLE_COLORS) {
         // Clear any existing background image.
-        $('body').css('background-image', '');
+        $('.js-background').css('background-image', '');
         // Increment color ID by two. This gives more visual change per swap, and
         // there's an odd number in the array, so 2nd time through is different.
         active_bg_color_idx = (active_bg_color_idx + 2) % BG_COLORS.length;
-        $('body').css('background-color', BG_COLORS[active_bg_color_idx]);
+        $('.js-background').css('background-color', BG_COLORS[active_bg_color_idx]);
       } else {
         // Don't start gifSet lookups before the data comes back.
         if (gifSet && (gifSet.length > 0)) {
           // Increment to next gif.
           activeBgGifIndex = (activeBgGifIndex + 1) % gifSet.length;
-          $('body').css('background-image', 'url(\'' + gifSet[activeBgGifIndex] + '\')');
+          $('.js-background').css('background-image', 'url(\'' + gifSet[activeBgGifIndex] + '\')');
         }
       }
     }
@@ -421,12 +430,11 @@ $(document).ready(function() {
       }
       // Set play/pause button.
       if (audioPlaying) {
-        $('#playback').attr('title', 'Stop');
+        $('#playback').innerHtml('<span class="js-geomicon geomicon" data-icon="pause"></span>');
       } else {
-        $('#playback').attr('title', 'Play');
+        $('#playback').innerHtml('<span class="js-geomicon geomicon" data-icon="play"></span>');
       }
       // Set next button.
       $('#next').attr('title', 'Next audio clip');
     }
-
 });
