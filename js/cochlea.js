@@ -100,7 +100,7 @@ $(document).ready(function() {
     $('#playback').click(togglePlayback);
     $('#stop-playback').click(togglePlayback);
     $('#next').click(nextSound);
-    updateUITitleText();
+    updateUI();
 
     // TODO: Clean up creation of AudioNodes (either singletons or
     // garbage collect them). If you swap back and forth between
@@ -237,8 +237,8 @@ $(document).ready(function() {
       sourceNode.start(0);
       // Update UI.
       $('#playback').addClass('playing');
-      updateUITitleText();  // Called in togglePlayback, but this call happens
-                            // in parallel, updates audioPlaying=true too late.
+      updateUI();  // Called in togglePlayback, but this call happens
+                   // in parallel, updates audioPlaying=true too late.
     }
 
     function stopSound() {
@@ -262,7 +262,7 @@ $(document).ready(function() {
         // TODO: Prompt query for gif search
         giphySearch('party');
       }
-      updateUITitleText();
+      updateUI();
     }
 
     // From Giphy's API reference: https://github.com/Giphy/GiphyAPI
@@ -305,7 +305,7 @@ $(document).ready(function() {
         // Can't unpause a AudioBufferSourceNode :(
         loadSound(TRACKLIST[activeTrackID]); 
       }
-      updateUITitleText();
+      updateUI();
     }
 
     function toggleMicrophone() {
@@ -330,7 +330,7 @@ $(document).ready(function() {
         $('#source-mic').addClass('playing');
         use_mic = true;
       }
-      updateUITitleText();
+      updateUI();
     }
 
     function nextSound() {
@@ -414,23 +414,10 @@ $(document).ready(function() {
     }
 
     /**
-     * Keep the logic for title text here, so we can set them appropriately
-     * for each UI control, all in one place. Otherwise this is going to get
-     * messy
+     * Called whenever we need to update the UI. 
+     * Keeps all UI-specific logic in one place.
      */
-    function updateUITitleText() {
-      // Set background (image vs color) button.
-      if (bgStyle == BG_STYLE_COLORS) {
-        $('#bg-gif').attr('title', 'Switch to GIF backgrounds');
-      } else {
-        $('#bg-gif').attr('title', 'Switch to color backgrounds');
-      }
-      // Set mic on/off button.
-      if (use_mic) {
-        $('#source-mic').attr('title', 'Switch to file detection');
-      } else {
-        $('#source-mp3').attr('title', 'Switch to mic detection');
-      }
+    function updateUI() {
       // Set play/pause button.
       if (audioPlaying) {
         $('#playback').addClass('display-none');
@@ -439,7 +426,5 @@ $(document).ready(function() {
         $('#playback').removeClass('display-none');
         $('#stop-playback').addClass('display-none');
       }
-      // Set next button.
-      $('#next').attr('title', 'Next audio clip');
     }
 });
