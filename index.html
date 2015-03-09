@@ -15,7 +15,7 @@
         <h1 class="h4"><a class="white caps" href="https://github.com/staringispolite/cochlea">Cochlea</a></h1>
         <h2 class="gray regular h5">A frequency banding and beat detection Chrome experiment.</h2>
       </header>
-      <hr>
+      <hr class="mb1">
       <label class="h6 block bold caps mb1 gray">Visuals</label>
       <div class="inline-block clearfix silver mb1 js-button-group">
         <button id="bg-color" type="button" title="Switch to Flat-Color Backgrounds"
@@ -26,7 +26,7 @@
       <form id="giphy-search-form" action="">
         <input id="giphy-search-query" type="text" class="fit field-dark" placeholder="Search Giphy...">
       </form>
-      <hr>
+      <hr class="mb1">
       <label class="h6 block bold caps mb1 gray">Source</label>
       <div class="inline-block clearfix silver mb1 js-button-group">
         <button type="button" id="source-mp3" title="Switch Audio Source to MP3"
@@ -49,7 +49,7 @@
           <span class="js-geomicon geomicon" data-icon="next"></span>
         </button>
       </div>
-      <hr>
+      <hr class="mb1">
       <label class="h6 block bold caps mb1 gray">Threshold</label>
       <input id="beat-detect-threshold" type="range" class="fit mb2 range-light gray" value="150" min="0" max="255" tabindex="-1">
       <input id="threshold-range-value" type="text" class="col-3 field-dark gray" value="150" disabled>
@@ -57,13 +57,17 @@
       <label class="h6 block bold caps mb1 gray">Frequency Band</label>
       <input id="beat-detect-band" type="range" class="fit mb2 range-light gray" value="10" min="0" max="16" tabindex="-1">
       <input id="band-range-value" type="text" class="col-3 field-dark gray" value="10" disabled>
-      <hr>
+      <hr class="mb1">
       <footer>
         <a href="https://github.com/staringispolite/cochlea" class="silver">
           <span class="js-geomicon geomicon mr2" data-icon="github"></span>
         </a>
         <a href="https://twitter.com/staringispolite" class="silver">
-          <span class="js-geomicon geomicon" data-icon="twitter"></span>
+          <span class="js-geomicon geomicon mr2" data-icon="twitter"></span>
+        </a>
+        <a href="http://www.staringispolite.com" class="silver"
+            title="Made with <3 by Jonathan Howard">
+          <span class="js-geomicon geomicon" data-icon="user"></span>
         </a>
       </footer>
     </nav>

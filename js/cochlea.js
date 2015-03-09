@@ -1,7 +1,7 @@
 // Wait until DOM is loaded to start
 $(document).ready(function() {
     // jQuery logic for handling button groups
-    $( ".js-button-group button" ).click(function() {
+    $(".js-button-group button").click(function() {
       $(".js-button-group button").removeClass("bg-darken-4");
       $(".js-button-group button").addClass("gray");
 
@@ -481,19 +481,13 @@ $(document).ready(function() {
       }
       // Playback controls are disabled in microphone mode. Hide them.
       if (useMicrophone) {
-        $('#playback').removeClass('gray');
-        $('#stop-playback').removeClass('gray');
-        $('#next').removeClass('gray');
-        $('#playback').addClass('black');
-        $('#stop-playback').addClass('black');
-        $('#next').addClass('black');
+        $('#playback').attr('disabled','true');
+        $('#stop-playback').attr('disabled','true');
+        $('#next').attr('disabled','true');
       } else {
-        $('#playback').removeClass('black');
-        $('#stop-playback').removeClass('black');
-        $('#next').removeClass('black');
-        $('#playback').addClass('gray');
-        $('#stop-playback').addClass('gray');
-        $('#next').addClass('gray');
+        $('#playback').removeAttr('disabled');
+        $('#stop-playback').removeAttr('disabled');
+        $('#next').removeAttr('disabled');
       }
     }
 });
