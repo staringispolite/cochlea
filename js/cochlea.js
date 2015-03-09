@@ -296,17 +296,19 @@ $(document).ready(function() {
       });
     }
 
-    //TODO: Disable playback controls in mic mode.
     function togglePlayback() {
-      if (audioPlaying) {
-        // Stop playing from audio file.
-        stopSound();
-      } else {
-        // Start playing from audio file. Can't unpause an
-        // AudioBufferSourceNode so we have to load from scratch :(
-        loadSound(TRACKLIST[activeTrackID]); 
+      // Playback controls disabled in microphone mode.
+      if (!use_mic) {
+        if (audioPlaying) {
+          // Stop playing from audio file.
+          stopSound();
+        } else {
+          // Start playing from audio file. Can't unpause an
+          // AudioBufferSourceNode so we have to load from scratch :(
+          loadSound(TRACKLIST[activeTrackID]); 
+        }
+        updateUI();
       }
-      updateUI();
     }
 
     function toAudioSourceFile() {
@@ -340,17 +342,20 @@ $(document).ready(function() {
     }
 
     function nextSound() {
-      //var newURL = prompt("Enter URL of a new song to play");
-      //if (newURL !== undefined) {
-      //  songURL = newURL;
-      //}
-      activeTrackID = (activeTrackID + 1) % TRACKLIST.length;
-      if (audioPlaying) {
-        // Only stop first if already playing.
+      // Playback controls disabled in microphone mode.
+      if (!use_mic) {
+        //var newURL = prompt("Enter URL of a new song to play");
+        //if (newURL !== undefined) {
+        //  songURL = newURL;
+        //}
+        activeTrackID = (activeTrackID + 1) % TRACKLIST.length;
+        if (audioPlaying) {
+          // Only stop first if already playing.
+          togglePlayback();
+        }
+        // Now play (which will load newly-updated songURL).
         togglePlayback();
       }
-      // Now play (which will load newly-updated songURL).
-      togglePlayback();
     }
 
     // log if an error occurs
@@ -431,6 +436,22 @@ $(document).ready(function() {
       } else {
         $('#playback').removeClass('display-none');
         $('#stop-playback').addClass('display-none');
+      }
+      // Playback controls are disabled in microphone mode. Hide them.
+      if (use_mic) {
+        $('#playback').removeClass('gray');
+        $('#stop-playback').removeClass('gray');
+        $('#next').removeClass('gray');
+        $('#playback').addClass('black');
+        $('#stop-playback').addClass('black');
+        $('#next').addClass('black');
+      } else {
+        $('#playback').removeClass('black');
+        $('#stop-playback').removeClass('black');
+        $('#next').removeClass('black');
+        $('#playback').addClass('gray');
+        $('#stop-playback').addClass('gray');
+        $('#next').addClass('gray');
       }
     }
 });
