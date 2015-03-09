@@ -97,8 +97,8 @@ $(document).ready(function() {
     $('#bg-color').click(toColorBackground);
     $('#source-mic').click(toAudioSourceMicrophone);
     $('#source-mp3').click(toAudioSourceFile);
-    $('#playback').click(togglePlayback);
-    $('#stop-playback').click(togglePlayback);
+    $('#playback').click(startPlayback);
+    $('#stop-playback').click(stopPlayback);
     $('#next').click(nextSound);
     updateUI();
 
@@ -237,7 +237,7 @@ $(document).ready(function() {
       sourceNode.start(0);
       // Update UI.
       $('#playback').addClass('playing');
-      updateUI();  // Called in togglePlayback, but this call happens
+      updateUI();  // Called in start/stopPlayback, but this call happens
                    // in parallel, updates audioPlaying=true too late.
     }
 
@@ -296,18 +296,30 @@ $(document).ready(function() {
       });
     }
 
-    function togglePlayback() {
+    function startPlayback() {
       // Playback controls disabled in microphone mode.
       if (!useMicrophone) {
-        if (audioPlaying) {
-          // Stop playing from audio file.
-          stopSound();
-        } else {
+        // Only start playing if we're not already.
+        if (!audioPlaying) {
           // Start playing from audio file. Can't unpause an
           // AudioBufferSourceNode so we have to load from scratch :(
           loadSound(TRACKLIST[activeTrackID]); 
+
+          updateUI();
         }
-        updateUI();
+      }
+    }
+
+    function stopPlayback() {
+      // Playback controls disabled in microphone mode.
+      if (!useMicrophone) {
+        // Only stop playing if we're already playing.
+        if (audioPlaying) {
+          // Stop playing from audio file.
+          stopSound();
+
+          updateUI();
+        }
       }
     }
 
@@ -328,7 +340,7 @@ $(document).ready(function() {
       if (!useMicrophone) {
         // Stop playback if it's happening.
         if (audioPlaying) {
-          togglePlayback();
+          stopPlayback();
         }
 
         // Turn on microphone.
@@ -348,13 +360,14 @@ $(document).ready(function() {
         //if (newURL !== undefined) {
         //  songURL = newURL;
         //}
-        activeTrackID = (activeTrackID + 1) % TRACKLIST.length;
         if (audioPlaying) {
           // Only stop first if already playing.
-          togglePlayback();
+          stopPlayback();
         }
+        // Increment track.
+        activeTrackID = (activeTrackID + 1) % TRACKLIST.length;
         // Now play (which will load newly-updated songURL).
-        togglePlayback();
+        startPlayback();
       }
     }
 
