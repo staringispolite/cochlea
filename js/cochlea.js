@@ -100,6 +100,10 @@ $(document).ready(function() {
     $('#playback').click(startPlayback);
     $('#stop-playback').click(stopPlayback);
     $('#next').click(nextSound);
+    $('#giphy-search-form').submit(onGiphyFormSubmit);
+    // Pre-load party GIFs so there's something there if user switches to GIFs
+    // without using the text box.
+    giphySearch('party');
     updateUI();
 
     // TODO: Clean up creation of AudioNodes (either singletons or
@@ -220,7 +224,6 @@ $(document).ready(function() {
         // decode the data
         context.decodeAudioData(request.response, function(buffer) {
           // when the audio is decoded play the sound
-          console.log('success!')
           if (!isPreload) {
             initSound(buffer);
           }
@@ -252,8 +255,6 @@ $(document).ready(function() {
       if (bgStyle != BG_STYLE_GIFS) {
         // Set to gifs
         bgStyle = BG_STYLE_GIFS;
-        // TODO: User provides query for gif search
-        giphySearch('party');
         // Update UI.
         updateUI();
       }
@@ -268,16 +269,28 @@ $(document).ready(function() {
       }
     }
 
+    function onGiphyFormSubmit(event) {
+      var query = $.trim($('#giphy-search-query').val());
+      // Some basic validation.
+      if ((query !== undefined) && (query != "")) {
+        // Automatically switch to GIF background.
+        toGifBackground();
+        // Get images from Giphy.
+        giphySearch(query);
+      }
+      // Don't let form submit refresh the page.
+      event.preventDefault();
+    }
+
     // From Giphy's API reference: https://github.com/Giphy/GiphyAPI
     // and RaveRobot: https://github.com/simplecasual/raverobot.com
     function giphySearch(query) {
-      var xhr = $.get("https://api.giphy.com/v1/gifs/search?q=" + query + "&api_key=dc6zaTOxFJmzC&limit=200");
+      var xhr = $.get("https://api.giphy.com/v1/gifs/search?q=" + query + "&api_key=dc6zaTOxFJmzC&limit=20");
       xhr.done(function(data) { 
         var loading = [];
         var gifURL = "";
         for (var i = 0; i < data.data.length; i++) {
           gifURL = "https://media2.giphy.com/media/" + data.data[i].id + "/giphy.gif"
-          //console.log(gifURL);
           loading.push(gifURL); 
         }
         var numLoaded = 0;
@@ -382,7 +395,6 @@ $(document).ready(function() {
      */
     function registerBeatDetected(array, beatTime) {
       var timeCode = beatTime - timeData.startTime;
-      //console.log('beat detected at ' + timeCode);
       timeData.beatTimecodes.push(timeCode);
     }
 
