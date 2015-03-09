@@ -25,7 +25,7 @@ $(document).ready(function() {
     var gainNode = null;
     var audioPlaying = false;
     var audioNodesSetUp = false;
-    var use_mic = false;
+    var useMicrophone = false;
     var timeData = {
       startTime: 0,     // Starting time of playback
       beatTimecodes: [] // Array of [beatTime-startTime]
@@ -298,7 +298,7 @@ $(document).ready(function() {
 
     function togglePlayback() {
       // Playback controls disabled in microphone mode.
-      if (!use_mic) {
+      if (!useMicrophone) {
         if (audioPlaying) {
           // Stop playing from audio file.
           stopSound();
@@ -313,19 +313,19 @@ $(document).ready(function() {
 
     function toAudioSourceFile() {
       // Only do this if we're not already sourcing audio from files.
-      if (use_mic) {
+      if (useMicrophone) {
         // Turn off microphone.
         microphoneStream.disconnect();
 
         // Update UI.
-        use_mic = false;
+        useMicrophone = false;
         updateUI();
       }
     }
 
     function toAudioSourceMicrophone() {
       // Only do this if we're not already sourcing audio from the mic.
-      if (!use_mic) {
+      if (!useMicrophone) {
         // Stop playback if it's happening.
         if (audioPlaying) {
           togglePlayback();
@@ -336,14 +336,14 @@ $(document).ready(function() {
         setupMicrophoneBuffer();
 
         // Update UI.
-        use_mic = true;
+        useMicrophone = true;
         updateUI();
       }
     }
 
     function nextSound() {
       // Playback controls disabled in microphone mode.
-      if (!use_mic) {
+      if (!useMicrophone) {
         //var newURL = prompt("Enter URL of a new song to play");
         //if (newURL !== undefined) {
         //  songURL = newURL;
@@ -438,7 +438,7 @@ $(document).ready(function() {
         $('#stop-playback').addClass('display-none');
       }
       // Playback controls are disabled in microphone mode. Hide them.
-      if (use_mic) {
+      if (useMicrophone) {
         $('#playback').removeClass('gray');
         $('#stop-playback').removeClass('gray');
         $('#next').removeClass('gray');
