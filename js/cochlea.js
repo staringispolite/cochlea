@@ -95,7 +95,8 @@ $(document).ready(function() {
     // Set up click events.
     $('#bg-gif').click(toggleBackground);
     $('#bg-color').click(toggleBackground);
-    $('#mic').click(toggleMicrophone);
+    $('#source-mic').click(toggleMicrophone);
+    $('#source-mp3').click(toggleMicrophone);
     $('#playback').click(togglePlayback);
     $('#stop-playback').click(togglePlayback);
     $('#next').click(nextSound);
@@ -313,7 +314,7 @@ $(document).ready(function() {
         microphoneStream.disconnect();
 
         // Update UI.
-        $('#mic').removeClass('playing');
+        $('#source-mic').removeClass('playing');
         use_mic = false;
       } else {
         // Stop playback if it's happening.
@@ -326,7 +327,7 @@ $(document).ready(function() {
         setupMicrophoneBuffer();
 
         // Update UI.
-        $('#mic').addClass('playing');
+        $('#source-mic').addClass('playing');
         use_mic = true;
       }
       updateUITitleText();
@@ -426,9 +427,9 @@ $(document).ready(function() {
       }
       // Set mic on/off button.
       if (use_mic) {
-        $('#mic').attr('title', 'Switch to file detection');
+        $('#source-mic').attr('title', 'Switch to file detection');
       } else {
-        $('#mic').attr('title', 'Switch to mic detection');
+        $('#source-mp3').attr('title', 'Switch to mic detection');
       }
       // Set play/pause button.
       if (audioPlaying) {
