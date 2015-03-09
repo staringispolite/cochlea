@@ -93,8 +93,8 @@ $(document).ready(function() {
     loadSound(TRACKLIST[activeTrackID], isPreload=true);
 
     // Set up click events.
-    $('#bg-gif').click(toggleBackground);
-    $('#bg-color').click(toggleBackground);
+    $('#bg-gif').click(toGifBackground);
+    $('#bg-color').click(toColorBackground);
     $('#source-mic').click(toggleMicrophone);
     $('#source-mp3').click(toggleMicrophone);
     $('#playback').click(togglePlayback);
@@ -248,21 +248,24 @@ $(document).ready(function() {
       printBeatsDetected();
     }
 
-    function toggleBackground() {
-      if (bgStyle == BG_STYLE_GIFS) {
+    function toGifBackground() {
+      if (bgStyle != BG_STYLE_GIFS) {
+        // Set to gifs
+        bgStyle = BG_STYLE_GIFS;
+        // TODO: User provides query for gif search
+        giphySearch('party');
+        // Update UI.
+        updateUI();
+      }
+    }
+
+    function toColorBackground() {
+      if (bgStyle != BG_STYLE_COLORS) {
         // Set to colors
         bgStyle = BG_STYLE_COLORS;
         // Update UI.
-        $('#bg-gif').removeClass('showing-gif');
-      } else {
-        // Set to gifs
-        bgStyle = BG_STYLE_GIFS;
-        // Update UI.
-        $('#bg-gif').addClass('showing-gif');
-        // TODO: Prompt query for gif search
-        giphySearch('party');
+        updateUI();
       }
-      updateUI();
     }
 
     // From Giphy's API reference: https://github.com/Giphy/GiphyAPI
@@ -414,7 +417,7 @@ $(document).ready(function() {
     }
 
     /**
-     * Called whenever we need to update the UI. 
+     * Called whenever we need to update the UI.
      * Keeps all UI-specific logic in one place.
      */
     function updateUI() {
