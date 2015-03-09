@@ -97,6 +97,7 @@ $(document).ready(function() {
     $('#bg-color').click(toggleBackground);
     $('#mic').click(toggleMicrophone);
     $('#playback').click(togglePlayback);
+    $('#stop-playback').click(togglePlayback);
     $('#next').click(nextSound);
     updateUITitleText();
 
@@ -431,9 +432,11 @@ $(document).ready(function() {
       }
       // Set play/pause button.
       if (audioPlaying) {
-        $('#playback').innerHtml('<span class="js-geomicon geomicon" data-icon="pause"></span>');
+        $('#playback').addClass('display-none');
+        $('#stop-playback').removeClass('display-none');
       } else {
-        $('#playback').innerHtml('<span class="js-geomicon geomicon" data-icon="play"></span>');
+        $('#playback').removeClass('display-none');
+        $('#stop-playback').addClass('display-none');
       }
       // Set next button.
       $('#next').attr('title', 'Next audio clip');
