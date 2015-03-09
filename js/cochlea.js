@@ -101,6 +101,8 @@ $(document).ready(function() {
     $('#stop-playback').click(stopPlayback);
     $('#next').click(nextSound);
     $('#giphy-search-form').submit(onGiphyFormSubmit);
+    $('#beat-detect-threshold').change(onChangeThresholdSlider);
+    $('#beat-detect-band').change(onChangeBandSlider);
     // Pre-load party GIFs so there's something there if user switches to GIFs
     // without using the text box.
     giphySearch('party');
@@ -366,6 +368,20 @@ $(document).ready(function() {
       }
     }
 
+    function onChangeThresholdSlider(event) {
+      var newThreshold = $('#beat-detect-threshold').val();
+      beatDetectThreshold = newThreshold;
+      beatDetector.setThreshold(beatDetectThreshold);
+      $('#threshold-range-value').val(newThreshold);
+    }
+
+    function onChangeBandSlider(event) {
+      var newBand = $('#beat-detect-band').val();
+      beatDetectBand = newBand;
+      beatDetector.setFrequencyBand(beatDetectBand);
+      $('#band-range-value').val(newBand);
+    }
+
     function nextSound() {
       // Playback controls disabled in microphone mode.
       if (!useMicrophone) {
@@ -411,6 +427,7 @@ $(document).ready(function() {
      * Draw the EQ spectrum lines, given one frame of audio.
      */
     function drawSpectrum(array) {
+      // TODO: Odd numbers -> corresponding even ones, since we're only showing half.
       for ( var i = 0; i < (array.length); i+=2 ){
         if (i == beatDetectBand) {
           // Set the beat detecting fill style.
