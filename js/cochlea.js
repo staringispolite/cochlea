@@ -427,9 +427,14 @@ $(document).ready(function() {
      * Draw the EQ spectrum lines, given one frame of audio.
      */
     function drawSpectrum(array) {
-      // TODO: Odd numbers -> corresponding even ones, since we're only showing half.
+      // Odd numbers -> corresponding even ones, since we're only showing half.
+      var displayBand = beatDetectBand;
+      if ((displayBand % 2) != 0) {
+        displayBand++;
+      }
+      // Draw the frequency bands.
       for ( var i = 0; i < (array.length); i+=2 ){
-        if (i == beatDetectBand) {
+        if (i == displayBand) {
           // Set the beat detecting fill style.
           ctx.fillStyle = beat_detect_gradient;
         } else {
