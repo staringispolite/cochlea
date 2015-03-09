@@ -6,3 +6,7 @@
 footer a:hover {
   text-decoration: none;
 }
+
+nav {
+  max-width: 13em;
+}
