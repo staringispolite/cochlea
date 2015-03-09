@@ -95,8 +95,8 @@ $(document).ready(function() {
     // Set up click events.
     $('#bg-gif').click(toGifBackground);
     $('#bg-color').click(toColorBackground);
-    $('#source-mic').click(toggleMicrophone);
-    $('#source-mp3').click(toggleMicrophone);
+    $('#source-mic').click(toAudioSourceMicrophone);
+    $('#source-mp3').click(toAudioSourceFile);
     $('#playback').click(togglePlayback);
     $('#stop-playback').click(togglePlayback);
     $('#next').click(nextSound);
@@ -296,30 +296,34 @@ $(document).ready(function() {
       });
     }
 
+    //TODO: Disable playback controls in mic mode.
     function togglePlayback() {
       if (audioPlaying) {
         // Stop playing from audio file.
         stopSound();
       } else {
-        // Start playing from audio file.
-        if (use_mic) {
-          toggleMicrophone();
-        }
-        // Can't unpause a AudioBufferSourceNode :(
+        // Start playing from audio file. Can't unpause an
+        // AudioBufferSourceNode so we have to load from scratch :(
         loadSound(TRACKLIST[activeTrackID]); 
       }
       updateUI();
     }
 
-    function toggleMicrophone() {
+    function toAudioSourceFile() {
+      // Only do this if we're not already sourcing audio from files.
       if (use_mic) {
         // Turn off microphone.
         microphoneStream.disconnect();
 
         // Update UI.
-        $('#source-mic').removeClass('playing');
         use_mic = false;
-      } else {
+        updateUI();
+      }
+    }
+
+    function toAudioSourceMicrophone() {
+      // Only do this if we're not already sourcing audio from the mic.
+      if (!use_mic) {
         // Stop playback if it's happening.
         if (audioPlaying) {
           togglePlayback();
@@ -330,10 +334,9 @@ $(document).ready(function() {
         setupMicrophoneBuffer();
 
         // Update UI.
-        $('#source-mic').addClass('playing');
         use_mic = true;
+        updateUI();
       }
-      updateUI();
     }
 
     function nextSound() {
