@@ -1,5 +1,14 @@
 // Wait until DOM is loaded to start
 $(document).ready(function() {
+    // jQuery logic for handling button groups
+    $( ".js-button-group button" ).click(function() {
+      $(".js-button-group button").removeClass("bg-darken-4");
+      $(".js-button-group button").addClass("gray");
+
+      $(this).addClass("bg-darken-4");
+      $(this).removeClass("gray");
+    });
+
     // create the audio context (chrome only for now)
     if (! window.AudioContext) {
       if (! window.webkitAudioContext) {
@@ -16,7 +25,7 @@ $(document).ready(function() {
     var gainNode = null;
     var audioPlaying = false;
     var audioNodesSetUp = false;
-    var use_mic = false;
+    var useMicrophone = false;
     var timeData = {
       startTime: 0,     // Starting time of playback
       beatTimecodes: [] // Array of [beatTime-startTime]
@@ -84,11 +93,14 @@ $(document).ready(function() {
     loadSound(TRACKLIST[activeTrackID], isPreload=true);
 
     // Set up click events.
-    $('#background').click(toggleBackground);
-    $('#mic').click(toggleMicrophone);
-    $('#playback').click(togglePlayback);
+    $('#bg-gif').click(toGifBackground);
+    $('#bg-color').click(toColorBackground);
+    $('#source-mic').click(toAudioSourceMicrophone);
+    $('#source-mp3').click(toAudioSourceFile);
+    $('#playback').click(startPlayback);
+    $('#stop-playback').click(stopPlayback);
     $('#next').click(nextSound);
-    updateUITitleText();
+    updateUI();
 
     // TODO: Clean up creation of AudioNodes (either singletons or
     // garbage collect them). If you swap back and forth between
@@ -225,8 +237,8 @@ $(document).ready(function() {
       sourceNode.start(0);
       // Update UI.
       $('#playback').addClass('playing');
-      updateUITitleText();  // Called in togglePlayback, but this call happens
-                            // in parallel, updates audioPlaying=true too late.
+      updateUI();  // Called in start/stopPlayback, but this call happens
+                   // in parallel, updates audioPlaying=true too late.
     }
 
     function stopSound() {
@@ -236,21 +248,24 @@ $(document).ready(function() {
       printBeatsDetected();
     }
 
-    function toggleBackground() {
-      if (bgStyle == BG_STYLE_GIFS) {
+    function toGifBackground() {
+      if (bgStyle != BG_STYLE_GIFS) {
+        // Set to gifs
+        bgStyle = BG_STYLE_GIFS;
+        // TODO: User provides query for gif search
+        giphySearch('party');
+        // Update UI.
+        updateUI();
+      }
+    }
+
+    function toColorBackground() {
+      if (bgStyle != BG_STYLE_COLORS) {
         // Set to colors
         bgStyle = BG_STYLE_COLORS;
         // Update UI.
-        $('#background').removeClass('showing-gif');
-      } else {
-        // Set to gifs
-        bgStyle = BG_STYLE_GIFS;
-        // Update UI.
-        $('#background').addClass('showing-gif');
-        // TODO: Prompt query for gif search
-        giphySearch('party');
+        updateUI();
       }
-      updateUITitleText();
     }
 
     // From Giphy's API reference: https://github.com/Giphy/GiphyAPI
@@ -281,33 +296,51 @@ $(document).ready(function() {
       });
     }
 
-    function togglePlayback() {
-      if (audioPlaying) {
-        // Stop playing from audio file.
-        stopSound();
-      } else {
-        // Start playing from audio file.
-        if (use_mic) {
-          toggleMicrophone();
+    function startPlayback() {
+      // Playback controls disabled in microphone mode.
+      if (!useMicrophone) {
+        // Only start playing if we're not already.
+        if (!audioPlaying) {
+          // Start playing from audio file. Can't unpause an
+          // AudioBufferSourceNode so we have to load from scratch :(
+          loadSound(TRACKLIST[activeTrackID]); 
+
+          updateUI();
         }
-        // Can't unpause a AudioBufferSourceNode :(
-        loadSound(TRACKLIST[activeTrackID]); 
       }
-      updateUITitleText();
     }
 
-    function toggleMicrophone() {
-      if (use_mic) {
+    function stopPlayback() {
+      // Playback controls disabled in microphone mode.
+      if (!useMicrophone) {
+        // Only stop playing if we're already playing.
+        if (audioPlaying) {
+          // Stop playing from audio file.
+          stopSound();
+
+          updateUI();
+        }
+      }
+    }
+
+    function toAudioSourceFile() {
+      // Only do this if we're not already sourcing audio from files.
+      if (useMicrophone) {
         // Turn off microphone.
         microphoneStream.disconnect();
 
         // Update UI.
-        $('#mic').removeClass('playing');
-        use_mic = false;
-      } else {
+        useMicrophone = false;
+        updateUI();
+      }
+    }
+
+    function toAudioSourceMicrophone() {
+      // Only do this if we're not already sourcing audio from the mic.
+      if (!useMicrophone) {
         // Stop playback if it's happening.
         if (audioPlaying) {
-          togglePlayback();
+          stopPlayback();
         }
 
         // Turn on microphone.
@@ -315,24 +348,27 @@ $(document).ready(function() {
         setupMicrophoneBuffer();
 
         // Update UI.
-        $('#mic').addClass('playing');
-        use_mic = true;
+        useMicrophone = true;
+        updateUI();
       }
-      updateUITitleText();
     }
 
     function nextSound() {
-      //var newURL = prompt("Enter URL of a new song to play");
-      //if (newURL !== undefined) {
-      //  songURL = newURL;
-      //}
-      activeTrackID = (activeTrackID + 1) % TRACKLIST.length;
-      if (audioPlaying) {
-        // Only stop first if already playing.
-        togglePlayback();
+      // Playback controls disabled in microphone mode.
+      if (!useMicrophone) {
+        //var newURL = prompt("Enter URL of a new song to play");
+        //if (newURL !== undefined) {
+        //  songURL = newURL;
+        //}
+        if (audioPlaying) {
+          // Only stop first if already playing.
+          stopPlayback();
+        }
+        // Increment track.
+        activeTrackID = (activeTrackID + 1) % TRACKLIST.length;
+        // Now play (which will load newly-updated songURL).
+        startPlayback();
       }
-      // Now play (which will load newly-updated songURL).
-      togglePlayback();
     }
 
     // log if an error occurs
@@ -386,47 +422,49 @@ $(document).ready(function() {
     function swapBackground(array, timestamp) {
       if (bgStyle == BG_STYLE_COLORS) {
         // Clear any existing background image.
-        $('body').css('background-image', '');
+        $('.js-background').css('background-image', '');
         // Increment color ID by two. This gives more visual change per swap, and
         // there's an odd number in the array, so 2nd time through is different.
         active_bg_color_idx = (active_bg_color_idx + 2) % BG_COLORS.length;
-        $('body').css('background-color', BG_COLORS[active_bg_color_idx]);
+        $('.js-background').css('background-color', BG_COLORS[active_bg_color_idx]);
       } else {
         // Don't start gifSet lookups before the data comes back.
         if (gifSet && (gifSet.length > 0)) {
           // Increment to next gif.
           activeBgGifIndex = (activeBgGifIndex + 1) % gifSet.length;
-          $('body').css('background-image', 'url(\'' + gifSet[activeBgGifIndex] + '\')');
+          $('.js-background').css('background-image', 'url(\'' + gifSet[activeBgGifIndex] + '\')');
         }
       }
     }
 
     /**
-     * Keep the logic for title text here, so we can set them appropriately
-     * for each UI control, all in one place. Otherwise this is going to get
-     * messy
+     * Called whenever we need to update the UI.
+     * Keeps all UI-specific logic in one place.
      */
-    function updateUITitleText() {
-      // Set background (image vs color) button.
-      if (bgStyle == BG_STYLE_COLORS) {
-        $('#background').attr('title', 'Switch to GIF backgrounds');
-      } else {
-        $('#background').attr('title', 'Switch to color backgrounds');
-      }
-      // Set mic on/off button.
-      if (use_mic) {
-        $('#mic').attr('title', 'Switch to file detection');
-      } else {
-        $('#mic').attr('title', 'Switch to mic detection');
-      }
+    function updateUI() {
       // Set play/pause button.
       if (audioPlaying) {
-        $('#playback').attr('title', 'Stop');
+        $('#playback').addClass('display-none');
+        $('#stop-playback').removeClass('display-none');
       } else {
-        $('#playback').attr('title', 'Play');
+        $('#playback').removeClass('display-none');
+        $('#stop-playback').addClass('display-none');
       }
-      // Set next button.
-      $('#next').attr('title', 'Next audio clip');
+      // Playback controls are disabled in microphone mode. Hide them.
+      if (useMicrophone) {
+        $('#playback').removeClass('gray');
+        $('#stop-playback').removeClass('gray');
+        $('#next').removeClass('gray');
+        $('#playback').addClass('black');
+        $('#stop-playback').addClass('black');
+        $('#next').addClass('black');
+      } else {
+        $('#playback').removeClass('black');
+        $('#stop-playback').removeClass('black');
+        $('#next').removeClass('black');
+        $('#playback').addClass('gray');
+        $('#stop-playback').addClass('gray');
+        $('#next').addClass('gray');
+      }
     }
-
 });
