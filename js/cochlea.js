@@ -93,7 +93,8 @@ $(document).ready(function() {
     loadSound(TRACKLIST[activeTrackID], isPreload=true);
 
     // Set up click events.
-    $('#background').click(toggleBackground);
+    $('#bg-gif').click(toggleBackground);
+    $('#bg-color').click(toggleBackground);
     $('#mic').click(toggleMicrophone);
     $('#playback').click(togglePlayback);
     $('#next').click(nextSound);
@@ -250,12 +251,12 @@ $(document).ready(function() {
         // Set to colors
         bgStyle = BG_STYLE_COLORS;
         // Update UI.
-        $('#background').removeClass('showing-gif');
+        $('#bg-gif').removeClass('showing-gif');
       } else {
         // Set to gifs
         bgStyle = BG_STYLE_GIFS;
         // Update UI.
-        $('#background').addClass('showing-gif');
+        $('#bg-gif').addClass('showing-gif');
         // TODO: Prompt query for gif search
         giphySearch('party');
       }
@@ -418,9 +419,9 @@ $(document).ready(function() {
     function updateUITitleText() {
       // Set background (image vs color) button.
       if (bgStyle == BG_STYLE_COLORS) {
-        $('#background').attr('title', 'Switch to GIF backgrounds');
+        $('#bg-gif').attr('title', 'Switch to GIF backgrounds');
       } else {
-        $('#background').attr('title', 'Switch to color backgrounds');
+        $('#bg-gif').attr('title', 'Switch to color backgrounds');
       }
       // Set mic on/off button.
       if (use_mic) {
