@@ -240,7 +240,7 @@ $(document).ready(function() {
       sourceNode.buffer = buffer;
       audioPlaying = true;
       resetBeatsDetected();
-      timeData.startTime = Date.now();
+      timeData.startTime = Date.now(); // As close to playing file as possible.
       sourceNode.start(0);
       // Update UI.
       $('#playback').addClass('playing');
@@ -252,7 +252,6 @@ $(document).ready(function() {
       audioPlaying = false;
       sourceNode.stop(0);
       $('#playback').removeClass('playing');
-      printBeatsDetected();
     }
 
     function toGifBackground() {
@@ -334,6 +333,7 @@ $(document).ready(function() {
         if (audioPlaying) {
           // Stop playing from audio file.
           stopSound();
+          printBeatsDetected();
 
           updateUI();
         }
@@ -345,6 +345,7 @@ $(document).ready(function() {
       if (useMicrophone) {
         // Turn off microphone.
         microphoneStream.disconnect();
+        printBeatsDetected();
 
         // Update UI.
         useMicrophone = false;
@@ -359,6 +360,12 @@ $(document).ready(function() {
         if (audioPlaying) {
           stopPlayback();
         }
+
+        // Set up to record beats immediately.
+        // (Is there a better time to start?) Seems like people will need to
+        // adjust manually no matter what, might as well start when they click 'Mic'.
+        resetBeatsDetected();
+        timeData.startTime = Date.now();
 
         // Turn on microphone.
         setupAudioNodes();
@@ -459,11 +466,11 @@ $(document).ready(function() {
     };
 
     // Called when Dendrite detects a beat.
-    function onBeatDetected() {
+    function onBeatDetected(array, beatTime) {
       var roll = Math.random()*100;  // Random roll out of 100%.
       if (roll < beatSamplingRate) {
-        swapBackground();
-        registerBeatDetected();
+        swapBackground(array, beatTime);
+        registerBeatDetected(array, beatTime);
       }
     }
 
