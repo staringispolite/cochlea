@@ -52,13 +52,13 @@ $(document).ready(function() {
 
     // Beat detection with Dendrite.
     var beatDetector = new Dendrite();
-    var beatDetectBand = 10;       // 3rd-to-last band we see.
+    var beatDetectBand = 10;       // 3rd-to-last band we see out of 16.
     var beatDetectThreshold = 150; // Out of 255. Eyeballed this.
+    var beatSamplingRate = 60;     // Default to 100% of beat events.
+    var beat_detected = true;
     beatDetector.setFrequencyBand(beatDetectBand);
     beatDetector.setThreshold(beatDetectThreshold);
-    beatDetector.onBeatDetected(swapBackground);
-    beatDetector.onBeatDetected(registerBeatDetected);
-    var beat_detected = true; 
+    beatDetector.onBeatDetected(onBeatDetected);
 
     // Visualization globals
     var active_bg_color_idx = 0;
@@ -103,6 +103,8 @@ $(document).ready(function() {
     $('#giphy-search-form').submit(onGiphyFormSubmit);
     $('#beat-detect-threshold').change(onChangeThresholdSlider);
     $('#beat-detect-band').change(onChangeBandSlider);
+    $('#beat-sampling-rate').change(onChangeBeatSamplingSlider);
+
     // Pre-load party GIFs so there's something there if user switches to GIFs
     // without using the text box.
     giphySearch('party');
@@ -382,6 +384,12 @@ $(document).ready(function() {
       $('#band-range-value').val(newBand);
     }
 
+    function onChangeBeatSamplingSlider(event) {
+      var newSamplingRate = $('#beat-sampling-rate').val();
+      beatSamplingRate = newSamplingRate;
+      $('#beat-sampling-value').val(newSamplingRate + '%');
+    }
+
     function nextSound() {
       // Playback controls disabled in microphone mode.
       if (!useMicrophone) {
@@ -449,6 +457,15 @@ $(document).ready(function() {
       var yVal = 325-beatDetectThreshold;
       ctx.fillRect(0, yVal, 400, 1);
     };
+
+    // Called when Dendrite detects a beat.
+    function onBeatDetected() {
+      var roll = Math.random()*100;  // Random roll out of 100%.
+      if (roll < beatSamplingRate) {
+        swapBackground();
+        registerBeatDetected();
+      }
+    }
 
     /**
      * Redraw the background color in response to the beat detection.
