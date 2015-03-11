@@ -82,6 +82,19 @@ $(document).ready(function() {
       "#F6989D"
     ];
 
+    // Slightly less ugly to simulate pageviews with symbolic constants.
+    var URL_BUTTON_COLOR    = '/click/bg-color/';
+    var URL_BUTTON_GIF      = '/click/bg-gif/';
+    var URL_BUTTON_FILE     = '/click/source/file/';
+    var URL_BUTTON_MIC      = '/click/source/mic/';
+    var URL_BUTTON_PLAY     = '/click/file/play/';
+    var URL_BUTTON_STOP     = '/click/file/stop/';
+    var URL_BUTTON_NEXT     = '/click/file/next/';
+    var URL_RANGE_BAND      = '/click/range/band/';
+    var URL_RANGE_SAMPLING  = '/click/range/beat-sampling-rate/';
+    var URL_RANGE_THRESHOLD = '/click/range/threshold/';
+    var URL_SEARCH_GIPHY    = '/search/giphy/';
+
     // track list.
     var activeTrackID = 0;
     var TRACKLIST = [
@@ -256,6 +269,7 @@ $(document).ready(function() {
 
     function toGifBackground() {
       if (bgStyle != BG_STYLE_GIFS) {
+        _triggerPageview(URL_BUTTON_GIF);
         // Set to gifs
         bgStyle = BG_STYLE_GIFS;
         // Update UI.
@@ -263,8 +277,11 @@ $(document).ready(function() {
       }
     }
 
+    // TODO: separate button clicks from the main handler so GA doesn't
+    // double count, eg, giphy search?
     function toColorBackground() {
       if (bgStyle != BG_STYLE_COLORS) {
+        _triggerPageview(URL_BUTTON_COLOR);
         // Set to colors
         bgStyle = BG_STYLE_COLORS;
         // Update UI.
@@ -274,6 +291,8 @@ $(document).ready(function() {
 
     function onGiphyFormSubmit(event) {
       var query = $.trim($('#giphy-search-query').val());
+      _triggerPageview(_buildURL(URL_SEARCH_GIPHY, query));
+
       // Some basic validation.
       if ((query !== undefined) && (query != "")) {
         // Automatically switch to GIF background.
@@ -315,6 +334,7 @@ $(document).ready(function() {
     function startPlayback() {
       // Playback controls disabled in microphone mode.
       if (!useMicrophone) {
+        _triggerPageview(URL_BUTTON_PLAY);
         // Only start playing if we're not already.
         if (!audioPlaying) {
           // Start playing from audio file. Can't unpause an
@@ -329,6 +349,7 @@ $(document).ready(function() {
     function stopPlayback() {
       // Playback controls disabled in microphone mode.
       if (!useMicrophone) {
+        _triggerPageview(URL_BUTTON_STOP);
         // Only stop playing if we're already playing.
         if (audioPlaying) {
           // Stop playing from audio file.
@@ -343,6 +364,7 @@ $(document).ready(function() {
     function toAudioSourceFile() {
       // Only do this if we're not already sourcing audio from files.
       if (useMicrophone) {
+        _triggerPageview(URL_BUTTON_FILE);
         // Turn off microphone.
         microphoneStream.disconnect();
         printBeatsDetected();
@@ -356,6 +378,7 @@ $(document).ready(function() {
     function toAudioSourceMicrophone() {
       // Only do this if we're not already sourcing audio from the mic.
       if (!useMicrophone) {
+        _triggerPageview(URL_BUTTON_MIC);
         // Stop playback if it's happening.
         if (audioPlaying) {
           stopPlayback();
@@ -379,6 +402,8 @@ $(document).ready(function() {
 
     function onChangeThresholdSlider(event) {
       var newThreshold = $('#beat-detect-threshold').val();
+      _triggerPageview(_buildURL(URL_RANGE_THRESHOLD, newThreshold));
+
       beatDetectThreshold = newThreshold;
       beatDetector.setThreshold(beatDetectThreshold);
       $('#threshold-range-value').val(newThreshold);
@@ -386,6 +411,8 @@ $(document).ready(function() {
 
     function onChangeBandSlider(event) {
       var newBand = $('#beat-detect-band').val();
+      _triggerPageview(_buildURL(URL_RANGE_BAND, newBand));
+
       beatDetectBand = newBand;
       beatDetector.setFrequencyBand(beatDetectBand);
       $('#band-range-value').val(newBand);
@@ -393,6 +420,7 @@ $(document).ready(function() {
 
     function onChangeBeatSamplingSlider(event) {
       var newSamplingRate = $('#beat-sampling-rate').val();
+      _triggerPageview(_buildURL(URL_RANGE_SAMPLING, newSamplingRate));
       beatSamplingRate = newSamplingRate;
       $('#beat-sampling-value').val(newSamplingRate + '%');
     }
@@ -400,6 +428,8 @@ $(document).ready(function() {
     function nextSound() {
       // Playback controls disabled in microphone mode.
       if (!useMicrophone) {
+        _triggerPageview(URL_BUTTON_NEXT);
+
         //var newURL = prompt("Enter URL of a new song to play");
         //if (newURL !== undefined) {
         //  songURL = newURL;
@@ -518,5 +548,28 @@ $(document).ready(function() {
         $('#stop-playback').removeAttr('disabled');
         $('#next').removeAttr('disabled');
       }
+    }
+
+    /**
+     * Register simulated pageviews with GA
+     * https://developers.google.com/analytics/devguides/collection/analyticsjs/pages
+     *
+     * @param page,String -- Relative URL for the page to log a view on.
+     *                       eg. '/my-overridden-page?id=1'
+     * @param title,String -- HTML title of simulated page (optional)
+     *                       eg. 'My overridden Page'
+     */
+    function _triggerPageview(page, title) {
+      ga('send', 'pageview', {
+        'page': page,
+        'title': title
+      });
+    }
+
+    /*
+     * Returns full GA URL for URLs that need a param appended.
+     */
+    function _buildURL(page, queryParam) {
+      return page + queryParam;
     }
 });
