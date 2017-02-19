@@ -573,3 +573,38 @@ $(document).ready(function() {
       return page + queryParam;
     }
 });
+
+// p5.js
+var cnv;
+
+function resizeP5Canvas() {
+  // It's a child of the visualization section, so (0, 0).
+  var x = 0;
+  var y = 0;
+  cnv.position(x, y);
+
+  // Fill up the rest of the screen.
+  // The way they do width/height, CSS can't control size.
+  // (col-2 is 16.6666664%).
+  var sidebarWidth = windowWidth * .166666666666664;
+  var sizeX = windowWidth - sidebarWidth;
+  var sizeY = windowHeight;
+  cnv.size(sizeX, sizeY);
+}
+
+function setup() {
+  cnv = createCanvas(400, 325);
+  cnv.parent('p5container');
+  resizeP5Canvas();
+  background(255, 0, 200, 10);
+}
+
+function windowResized() {
+  resizeP5Canvas();
+}
+
+function draw() {
+  // Can draw whatever in here
+  // strokeWeight(40);
+  // ellipse(width / 2, height / 2, 100, 100);
+}
