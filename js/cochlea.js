@@ -1,6 +1,11 @@
 // TODO:
 // White circles -> background color (and abstract out the color to be used once everywhere.
-// Have circles respond to beat events.
+// Refactor so that...
+//   Cochlea is an object encapsulating all the beat logic.
+//   UI code is separate.
+//   Visualization code is one object per visualization style.
+//   Vis objects giving Cochlea callbacks to fire on beat.
+//   Can clearly document how to make a new visualization.
 var ellipses = [];
 var numCircles = 30;
 var canvasSizeX = 1300;
@@ -23,6 +28,7 @@ var BG_STYLE_CIRCLES = 2;
 var bgStyle = BG_STYLE_CIRCLES;
 var gifSet = [];
 var activeBgGifIndex = 0;
+var lastBeatFramecount = 0;
 
 function circleFactory() {
   // Basic variables.
@@ -595,7 +601,16 @@ $(document).ready(function() {
       if (roll < beatSamplingRate) {
         swapBackground(array, beatTime);
         registerBeatDetected(array, beatTime);
+        // TODO: move these "reactions" to a central Cochlea object, send it callbacks.
+        onBeatDetectedByCircles(array, beatTime);
       }
+    }
+
+    /**
+     * Barely does anything, but placeholder until I refactor for beat reaction callbacks
+     */
+    function onBeatDetectedByCircles(array, beatTime) {
+      lastBeatFramecount = frameCount;
     }
 
     /**
@@ -722,17 +737,21 @@ function draw() {
       translate(gravityWell.x, gravityWell.y);
       rotate(frameCount / el.rotationSpeed);
 
-      // "Age" the circle.
-      age = frameCount - el.born;
-      distanceFade = Math.sqrt(age*2) / 20.0;
-      el.sizeX = el.sizeX - distanceFade;
-      el.sizeY = el.sizeY - distanceFade;
-      el.a = originalOpacity * (el.sizeX / canvasSizeX);
-      var percentOfLife = el.a / 100;
-      var distX = el.x - gravityWell.x;
-      var distY = el.y - gravityWell.y;
-      el.x = el.x - (distX * percentOfLife) / 1000;
-      el.y = el.y - (distY * percentOfLife) / 1000;
+      // Pause briefly if a beat just happened.
+      var timeSinceLastBeat = frameCount - lastBeatFramecount;
+      if (timeSinceLastBeat < 10) {
+        // "Age" the circle.
+        age = frameCount - el.born;
+        distanceFade = Math.sqrt(age*2) / 20.0;
+        el.sizeX = el.sizeX - distanceFade;
+        el.sizeY = el.sizeY - distanceFade;
+        el.a = originalOpacity * (el.sizeX / canvasSizeX);
+        var percentOfLife = el.a / 100;
+        var distX = el.x - gravityWell.x;
+        var distY = el.y - gravityWell.y;
+        el.x = el.x - (distX * percentOfLife) / 1000;
+        el.y = el.y - (distY * percentOfLife) / 1000;
+      }
 
       // Draw circle
       strokeWeight(el.strokeWeight);
