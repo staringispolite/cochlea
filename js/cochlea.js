@@ -1,3 +1,6 @@
+// TODO:
+// White circles -> background color (and abstract out the color to be used once everywhere.
+// Have circles respond to beat events.
 var ellipses = [];
 var numCircles = 30;
 var canvasSizeX = 1300;
