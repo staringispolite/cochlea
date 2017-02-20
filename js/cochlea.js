@@ -17,7 +17,7 @@ var originalOpacity = 40;
 var BG_STYLE_COLORS = 0;
 var BG_STYLE_GIFS = 1;
 var BG_STYLE_CIRCLES = 2;
-var bgStyle = BG_STYLE_COLORS;
+var bgStyle = BG_STYLE_CIRCLES;
 var gifSet = [];
 var activeBgGifIndex = 0;
 
@@ -164,6 +164,7 @@ $(document).ready(function() {
     // Slightly less ugly to simulate pageviews with symbolic constants.
     var URL_BUTTON_COLOR    = '/click/bg-color/';
     var URL_BUTTON_GIF      = '/click/bg-gif/';
+    var URL_BUTTON_CIRCLE  = '/click/bg-circle/';
     var URL_BUTTON_FILE     = '/click/source/file/';
     var URL_BUTTON_MIC      = '/click/source/mic/';
     var URL_BUTTON_PLAY     = '/click/file/play/';
@@ -187,6 +188,7 @@ $(document).ready(function() {
     // Set up click events.
     $('#bg-gif').click(toGifBackground);
     $('#bg-color').click(toColorBackground);
+    $('#bg-circle').click(toCircleBackground);
     $('#source-mic').click(toAudioSourceMicrophone);
     $('#source-mp3').click(toAudioSourceFile);
     $('#playback').click(startPlayback);
@@ -351,6 +353,16 @@ $(document).ready(function() {
         _triggerPageview(URL_BUTTON_GIF);
         // Set to gifs
         bgStyle = BG_STYLE_GIFS;
+        // Update UI.
+        updateUI();
+      }
+    }
+
+    function toCircleBackground() {
+      if (bgStyle != BG_STYLE_CIRCLES) {
+        _triggerPageview(URL_BUTTON_CIRCLE);
+        // Set to circles
+        bgStyle = BG_STYLE_CIRCLES;
         // Update UI.
         updateUI();
       }
@@ -587,7 +599,7 @@ $(document).ready(function() {
      * Redraw the background color in response to the beat detection.
      */
     function swapBackground(array, timestamp) {
-      if (bgStyle == BG_STYLE_COLORS) {
+      if ((bgStyle == BG_STYLE_COLORS) || (bgStyle == BG_STYLE_CIRCLES)) {
         // Clear any existing background image.
         $('.js-background').css('background-image', '');
         // Increment color ID by two. This gives more visual change per swap, and
@@ -741,6 +753,8 @@ function draw() {
         ellipses[i] = circleFactory();
       }
     } 
+  } else {
+    clear(); // Hide p5 if another system's mode is active.
   }
 }
 
