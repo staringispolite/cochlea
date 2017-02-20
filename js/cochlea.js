@@ -739,7 +739,7 @@ function draw() {
 
       // Pause briefly if a beat just happened.
       var timeSinceLastBeat = frameCount - lastBeatFramecount;
-      if (timeSinceLastBeat < 10) {
+      if (timeSinceLastBeat < 5) {
         // "Age" the circle.
         age = frameCount - el.born;
         distanceFade = Math.sqrt(age*2) / 20.0;
